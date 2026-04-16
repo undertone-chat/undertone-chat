@@ -1,0 +1,3 @@
+pub const CONNECT_TIMEOUT_SECONDS: u64 = 3;
+pub const DISCONNECT_TIMEOUT_SECONDS: u64 = 2;
+pub const READ_BUFFER_SIZE: usize = 1024;
