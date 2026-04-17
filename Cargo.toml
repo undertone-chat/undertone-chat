@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["crates/undertone-common", "apps/server"]
+members = ["crates/undertone-common", "apps/server", "apps/client"]
 
 [workspace.dependencies]
 log = "0.4.29"
