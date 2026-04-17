@@ -9,26 +9,6 @@ interface LogViewProps extends React.ComponentProps<"div"> {
 }
 
 export const LogView = ({ ...props }: LogViewProps) => {
-  const [logs, setLogs] = useState<LogMessage[]>([]);
-
-  useEffect(() => {
-    // 1. Define an async function to set up the listener.
-    let unlisten;
-
-    async function setupListener() {
-      unlisten = await listen<LogMessage>("log-message", (event) => {
-        console.log("Got poop!");
-        setLogs([...logs, event.payload.message]);
-      });
-    }
-
-    setupListener();
-
-    return () => {
-      if (unlisten) unlisten();
-    };
-  }, []);
-
   return (
     <div {...props}>
       Im a log{" "}
