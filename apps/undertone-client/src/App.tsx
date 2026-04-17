@@ -2,6 +2,7 @@ import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
+import { LogView } from "./components/LogView";
 
 function App() {
   const [greetMsg, setGreetMsg] = useState("");
@@ -12,7 +13,7 @@ function App() {
   }
   async function greet() {
     // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
+    setGreetMsg(await invoke("test"));
   }
 
   return (
@@ -32,7 +33,7 @@ function App() {
         />
         <button type="submit">Greet</button>
       </form>
-      <p>{greetMsg}</p>
+      <LogView />
     </main>
   );
 }

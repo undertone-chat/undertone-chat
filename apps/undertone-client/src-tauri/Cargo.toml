@@ -5,6 +5,17 @@ description = "Undertone Client"
 authors = ["Victoria Beauray Sagady <cephypi@pm.me>"]
 edition = "2024"
 
+[profile.dev]
+incremental = true # Compile binary in smaller steps.
+
+[profile.release]
+codegen-units = 1 # Allows LLVM to perform better optimization
+lto = true # Enables link-time-optimization
+opt-level = "s" # Prioritize small binary size. Use '3' if you prefer speed.
+panic = "abort" # High performance by disabling panic handlers.
+strip = true # Ensures debug symbols are removed.
+
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
@@ -18,7 +29,7 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = [] }
+tauri = { version = "2", features = ["specta", "tracing"] }
 tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
@@ -26,3 +37,4 @@ tracing.workspace = true
 tracing-subscriber.workspace = true
 tokio.workspace = true
 anyhow.workspace = true
+thiserror.workspace = true
