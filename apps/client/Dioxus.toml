@@ -1,9 +1,35 @@
 [application]
+name = "Undertone"
+out_dir = "dist"
+asset_dir = "assets"
+
+[bundle]
+identifier = "com.undertone"
+publisher = "Undertone.chat"
+copyright = "Copyright 2025 Victoria Beauray Sagady"
+category = "SocialNetworking"
+short_description = "A realtime voice server for roleplay communities."
+icon = [
+    "icons/icon_16x16.png",
+    "icons/icon_24x24.png",
+    "icons/icon_32x32.png",
+    "icons/icon_48x48.png",
+    "icons/icon_64x64.png",
+    "icons/icon_128x128.png",
+    "icons/icon_256x256.png",
+    "icons/icon_512x512.png",
+    "icons/icon_1024x1024.png",
+    "icons/icon.ico",
+    "icons/icon.icns"
+]
+
+
+
 
 [web.app]
 
 # HTML title tag content
-title = "client"
+title = "Undertone"
 
 # include `assets` in web platform
 [web.resource]
