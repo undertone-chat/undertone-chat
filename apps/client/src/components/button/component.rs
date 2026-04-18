@@ -1,4 +1,5 @@
-use dioxus::prelude::*;
+use dioxus_native::prelude::*;
+
 use dioxus_primitives::dioxus_attributes::attributes;
 use dioxus_primitives::merge_attributes;
 
