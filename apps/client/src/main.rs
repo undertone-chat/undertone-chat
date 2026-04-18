@@ -1,4 +1,5 @@
 mod components;
+use components::button::Button;
 use dioxus_native::prelude::*;
 
 const ICON: Asset = asset!("/icons/icon.ico");
@@ -24,5 +25,6 @@ fn App() -> Element {
         div{
             img { src: LOGO, class: "logo"}
         }
+        Button { "Connect to Server" }
     }
 }
