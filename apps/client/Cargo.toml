@@ -7,13 +7,13 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-dioxus-native = { git = "https://github.com/DioxusLabs/blitz", rev = "d4650c4", features = ["prelude"] }
+dioxus = {version="0.7.5", features = ["logger"]}
 dioxus-primitives = { git = "https://github.com/DioxusLabs/components", version = "0.0.1", default-features = false }
 tracing.workspace = true
 tracing-subscriber.workspace = true
 
-# [features]
-# default = ["desktop"]
-# web = ["dioxus-native/web"]
-# desktop = ["dioxus-native/desktop"]
-# mobile = ["dioxus-native/mobile"]
+[features]
+default = ["desktop"]
+web = ["dioxus/web"]
+desktop = ["dioxus/desktop"]
+mobile = ["dioxus/mobile"]

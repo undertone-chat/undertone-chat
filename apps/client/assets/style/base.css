@@ -1,0 +1,48 @@
+@layer base {
+  :root {
+    --color-brand-primary: #d99b28;
+    --color-brand-secondary: #1a3747;
+    --color-placeholder: oklch(57.12% 0.0961 77.35deg);
+    --color-border-dim: #d99b28;
+    --color-border-focus: #d99b28;
+    --color-input-bg: var(--color-brand-secondary);
+    --color-input-bg-focus: oklch(41.1% 0.0532 234.7deg);
+    --color-button-bg-primary: var(--color-brand-primary);
+    --color-button-fg-primary: var(--color-brand-secondary);
+    --shadow-sharp-primary: 0.18rem 0.18rem var(--color-brand-primary);
+    --shadow-sharp-secondary: 0.18rem 0.18rem oklch(44.36% 0.0719 234.7deg);
+  }
+
+  button {
+    background-color: var(--color-button-bg-primary);
+    color: var(--color-button-fg-primary);
+    font-weight: 500;
+    border-radius: 1ch;
+    padding: 0.5ch 2ch;
+    cursor: pointer;
+    margin: 0.2rem;
+
+    &:hover {
+      box-shadow: var(--shadow-sharp-secondary);
+      transform: translateY(-0.05rem) translateX(-0.05rem);
+    }
+  }
+
+  input {
+    background-color: var(--color-input-bg);
+    padding: 0.5ch 2ch;
+    border-radius: 1ch;
+    margin: 0.5ch 1ch;
+    color: var(--color-brand-primary);
+
+    &::placeholder {
+      color: var(--color-placeholder);
+    }
+
+    &:focus {
+      border-color: var(--color-border-focus);
+      background: var(--color-input-bg-focus);
+      box-shadow: 0.15rem 0.15rem 0 var(--color-brand-primary);
+    }
+  }
+}
