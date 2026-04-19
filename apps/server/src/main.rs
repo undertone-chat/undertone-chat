@@ -47,6 +47,7 @@ fn start_server() {
 
     acceptor_runtime.block_on(async {
         let listener = TcpListener::bind("127.0.0.1:9990").await.unwrap();
+        tracing::info!("Acceptor listening on 127.0.0.1:9990");
 
         loop {
             // Listen for new connections in the acceptor thread.
