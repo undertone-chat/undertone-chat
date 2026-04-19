@@ -44,5 +44,9 @@
       background: var(--color-input-bg-focus);
       box-shadow: 0.15rem 0.15rem 0 var(--color-brand-primary);
     }
+
+    &.input-error {
+      background: red;
+    }
   }
 }

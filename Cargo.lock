@@ -3,6 +3,16 @@
 version = 4
 
 [[package]]
+name = "addr"
+version = "0.15.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a93b8a41dbe230ad5087cc721f8d41611de654542180586b315d9f4cf6b72bef"
+dependencies = [
+ "psl",
+ "psl-types",
+]
+
+[[package]]
 name = "adler2"
 version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -359,6 +369,7 @@ dependencies = [
 name = "client"
 version = "0.1.0"
 dependencies = [
+ "addr",
  "dioxus",
  "dioxus-primitives",
  "tracing",
@@ -1315,7 +1326,7 @@ dependencies = [
  "libc",
  "option-ext",
  "redox_users",
- "windows-sys 0.59.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -3515,6 +3526,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "psl"
+version = "2.1.203"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "76c0777260d32b76a8c3c197646707085d37e79d63b5872a29192c8d4f60f50b"
+dependencies = [
+ "psl-types",
+]
+
+[[package]]
 name = "psl-types"
 version = "2.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4558,7 +4578,7 @@ dependencies = [
  "getrandom 0.3.4",
  "once_cell",
  "rustix",
- "windows-sys 0.52.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
