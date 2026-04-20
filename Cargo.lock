@@ -370,10 +370,13 @@ name = "client"
 version = "0.1.0"
 dependencies = [
  "addr",
+ "crossbeam-channel",
  "dioxus",
  "dioxus-primitives",
+ "tokio",
  "tracing",
  "tracing-subscriber",
+ "undertone-common",
 ]
 
 [[package]]
