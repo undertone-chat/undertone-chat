@@ -20,6 +20,7 @@ pub struct ControlConnection {
     cmd_rx: UnboundedReceiver<ControlCommand>,
     event_tx: UnboundedSender<UiEvent>,
     audio_tx: CrossbeamSender<AudioCommand>,
+    stream: Option<TcpStream>,
 }
 
 impl ControlConnection {
@@ -32,15 +33,20 @@ impl ControlConnection {
             cmd_rx,
             event_tx,
             audio_tx,
+            stream: None,
         }
     }
 
     pub async fn run(&mut self) {
-        let mut stream: Option<TcpStream> = None;
+        // let mut stream: Option<TcpStream> = None;
 
         while let Some(cmd) = self.cmd_rx.recv().await {
             match cmd {
                 ControlCommand::Connect(address) => {
+                    if self.stream.is_some() {
+                        tracing::warn!("Already connected!");
+                        return;
+                    }
                     let _ = self
                         .event_tx
                         .send(UiEvent::ConnectionStatus("Connecting...".into()));
@@ -49,10 +55,10 @@ impl ControlConnection {
                             let _ = self
                                 .event_tx
                                 .send(UiEvent::ConnectionStatus("Connected!".into()));
-                            stream = Some(tcp);
+                            self.stream = Some(tcp);
                             // Pass stream to handler in new thread.
                             tokio::spawn(async move {
-                                stream_handler(stream).await;
+                                stream_handler(tcp).await;
                             });
                             let _ = self.audio_tx.send(AudioCommand::StartStreaming(address));
                         }
@@ -64,22 +70,22 @@ impl ControlConnection {
                     }
                 }
                 ControlCommand::Disconnect => {
-                    stream = None;
+                    self.stream = None;
                     let _ = self.event_tx.send(UiEvent::ConnectionLost);
                     let _ = self.audio_tx.send(AudioCommand::Shutdown);
                 }
-                _ => {
-                    tracing::debug!("Unhandled command.");
+                any => {
+                    tracing::debug!("Unhandled command: {:?}", any);
                 }
             }
         }
     }
 }
 
-async fn stream_handler(stream: Option<TcpStream>) {
-    let Some(mut socket) = stream else {
-        return;
-    };
+async fn stream_handler(mut socket: TcpStream) {
+    // let Some(mut socket) = stream else {
+    //     return;
+    // };
 
     let mut buf = [0; 1024];
     tracing::debug!(
