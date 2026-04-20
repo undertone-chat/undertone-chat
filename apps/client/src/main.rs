@@ -1,10 +1,11 @@
+// Modules
 mod components;
 mod audio;
 mod control_connection;
+
+// Dependencies
 use dioxus::prelude::*;
 use tracing::Level;
-use audio::{ AudioCommand};
-
 use crossbeam_channel::unbounded;
 use components::ServerConnect;
 use tokio::sync::mpsc;
@@ -29,7 +30,6 @@ fn App() -> Element {
 
     // Shared UI State
     let mut connection_status = use_signal(|| "Disconnected".to_string());
-    let mut is_muted = use_signal(|| false);
 
     // Spawn the Audio thread ONLY ONCE using use_hook
     use_hook(|| {

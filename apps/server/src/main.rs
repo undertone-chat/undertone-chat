@@ -72,7 +72,7 @@ async fn stream_handler(mut stream: TcpStream) {
     loop {
         stream.readable().await.unwrap();
         let n = match stream.read(&mut buf).await {
-            // Scoket Closed
+            // Socket Closed
             Ok(0) => return,
             Ok(n) => n,
             Err(error) => {
