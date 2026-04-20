@@ -1,7 +1,7 @@
 use crossbeam_channel::Sender as CrossbeamSender;
 use dioxus::prelude::Signal;
 use dioxus::signals::WritableExt;
-use tokio::io::AsyncWriteExt;
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpStream;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 
@@ -19,14 +19,14 @@ pub enum ControlCommand {
 pub struct ControlConnection {
     cmd_rx: UnboundedReceiver<ControlCommand>,
     event_tx: UnboundedSender<UiEvent>,
-    audio_tx: UnboundedSender<AudioCommand>,
+    audio_tx: CrossbeamSender<AudioCommand>,
 }
 
 impl ControlConnection {
     pub fn new(
         mut cmd_rx: UnboundedReceiver<ControlCommand>,
         event_tx: UnboundedSender<UiEvent>,
-        audio_tx: UnboundedSender<AudioCommand>,
+        audio_tx: CrossbeamSender<AudioCommand>,
     ) -> Self {
         Self {
             cmd_rx,
@@ -50,6 +50,10 @@ impl ControlConnection {
                                 .event_tx
                                 .send(UiEvent::ConnectionStatus("Connected!".into()));
                             stream = Some(tcp);
+                            // Pass stream to handler in new thread.
+                            tokio::spawn(async move {
+                                stream_handler(stream).await;
+                            });
                             let _ = self.audio_tx.send(AudioCommand::StartStreaming(address));
                         }
                         Err(error) => {
@@ -72,38 +76,65 @@ impl ControlConnection {
     }
 }
 
-pub async fn run_tcp_actor(
-    mut cmd_rx: UnboundedReceiver<ControlCommand>,
-    event_tx: UnboundedSender<UiEvent>, // UI Listener
-    audio_tx: CrossbeamSender<AudioCommand>,
-) {
-    let mut stream: Option<TcpStream> = None;
+async fn stream_handler(stream: Option<TcpStream>) {
+    let Some(mut socket) = stream else {
+        return;
+    };
 
-    // This loop stays alive independently of the UI components
-    while let Some(cmd) = cmd_rx.recv().await {
-        match cmd {
-            ControlCommand::Connect(address) => {
-                tracing::debug!("Got Control Command Connect");
-                let _ = event_tx.send(UiEvent::ConnectionStatus("Connecing...".into()));
-                match TcpStream::connect(&address).await {
-                    Ok(tcp) => {
-                        let _ = event_tx.send(UiEvent::ConnectionStatus("Connected!".into()));
-                        stream = Some(tcp);
-                        let _ = audio_tx.send(AudioCommand::StartStreaming(address));
-                    }
-                    Err(e) => {
-                        let _ = event_tx.send(UiEvent::ConnectionStatus(format!("Error: {}", e)));
-                    }
-                }
+    let mut buf = [0; 1024];
+    tracing::debug!(
+        "stream  handler started for connection to {}",
+        socket.peer_addr().unwrap()
+    );
+
+    loop {
+        socket.readable().await.unwrap();
+        let n = match socket.read(&mut buf).await {
+            Ok(0) => return,
+            Ok(n) => n,
+            Err(error) => {
+                tracing::error!("Failed to read from socket; err= {:?}", error);
+                return;
             }
-            ControlCommand::Disconnect => {
-                stream = None;
-                let _ = event_tx.send(UiEvent::ConnectionLost);
-                let _ = audio_tx.send(AudioCommand::Shutdown);
-            }
-            _ => {
-                tracing::debug!("Unhandled Command Message!");
-            }
-        }
+        };
+
+        let answer = std::str::from_utf8(&buf[0..n]).expect("some utf bs");
+        tracing::debug!("Got: {}", answer);
     }
 }
+
+// pub async fn run_tcp_actor(
+//     mut cmd_rx: UnboundedReceiver<ControlCommand>,
+//     event_tx: UnboundedSender<UiEvent>, // UI Listener
+//     audio_tx: CrossbeamSender<AudioCommand>,
+// ) {
+//     let mut stream: Option<TcpStream> = None;
+//
+//     // This loop stays alive independently of the UI components
+//     while let Some(cmd) = cmd_rx.recv().await {
+//         match cmd {
+//             ControlCommand::Connect(address) => {
+//                 tracing::debug!("Got Control Command Connect");
+//                 let _ = event_tx.send(UiEvent::ConnectionStatus("Connecing...".into()));
+//                 match TcpStream::connect(&address).await {
+//                     Ok(tcp) => {
+//                         let _ = event_tx.send(UiEvent::ConnectionStatus("Connected!".into()));
+//                         stream = Some(tcp);
+//                         let _ = audio_tx.send(AudioCommand::StartStreaming(address));
+//                     }
+//                     Err(e) => {
+//                         let _ = event_tx.send(UiEvent::ConnectionStatus(format!("Error: {}", e)));
+//                     }
+//                 }
+//             }
+//             ControlCommand::Disconnect => {
+//                 stream = None;
+//                 let _ = event_tx.send(UiEvent::ConnectionLost);
+//                 let _ = audio_tx.send(AudioCommand::Shutdown);
+//             }
+//             _ => {
+//                 tracing::debug!("Unhandled Command Message!");
+//             }
+//         }
+//     }
+// }

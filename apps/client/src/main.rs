@@ -11,7 +11,7 @@ use tokio::sync::mpsc;
 use tracing::Level;
 use ui_events::UiEvent;
 
-use crate::control_connection::ControlCommand;
+use crate::control_connection::{ControlCommand, ControlConnection};
 
 const ICON: Asset = asset!("/icons/icon.ico");
 const LOGO: Asset = asset!("/assets/undertone_icon.svg");
@@ -47,8 +47,12 @@ fn App() -> Element {
             })
             .expect("Failed to spawn audio thread");
 
+        // Spawn control thread for incoming and outgoing control connection stuff.
         tokio::spawn(async move {
-            control_connection::run_tcp_actor(control_rx, event_tx, audio_tx).await;
+            ControlConnection::new(control_rx, event_tx, audio_tx)
+                .run()
+                .await;
+            // control_connection::run_tcp_actor(control_rx, event_tx, audio_tx).await;
         });
 
         // Bridge to listen for events.
