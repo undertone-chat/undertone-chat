@@ -18,21 +18,21 @@ pub struct AudioEngine {
 
 impl AudioEngine {
     pub fn new(command_rx: Receiver<AudioCommand>) -> Self {
-        AudioEngine {
-            command_rx
-        }
+        AudioEngine { command_rx }
     }
-    pub fn run (mut self) {
+    pub fn run(mut self) {
         // Initialize Audio Hardware (cpal)
         // Bind std::net::UdpSocket
-
+        tracing::info!("Starting audio engine...");
         loop {
             // 1. Check for UI/Control commands (non-blocking)
             if let Ok(cmd) = self.command_rx.try_recv() {
                 match cmd {
-                    AudioCommand::Mute(state) => println!("Hardware Mute: {}", state),
+                    AudioCommand::Mute(state) => tracing::debug!("Hardware Mute: {}", state),
                     AudioCommand::Shutdown => break,
-                    any => { tracing::debug!("Unhandled AudioCommand: {:?}", any)}
+                    any => {
+                        tracing::debug!("Unhandled AudioCommand: {:?}", any)
+                    }
                 }
             }
         }
@@ -43,5 +43,3 @@ impl AudioEngine {
         // NOTE: Keep allocations and locks out of this loop!
     }
 }
-
-
