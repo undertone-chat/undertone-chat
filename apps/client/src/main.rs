@@ -1,16 +1,17 @@
 // Modules
-mod components;
 mod audio;
+mod components;
 mod control_connection;
-
+mod ui_events;
 // Dependencies
-use dioxus::prelude::*;
-use tracing::Level;
-use crossbeam_channel::unbounded;
 use components::ServerConnect;
+use crossbeam_channel::unbounded;
+use dioxus::prelude::*;
 use tokio::sync::mpsc;
+use tracing::Level;
+use ui_events::UiEvent;
 
-use crate::control_connection::{ControlCommand, ControlEvent};
+use crate::control_connection::ControlCommand;
 
 const ICON: Asset = asset!("/icons/icon.ico");
 const LOGO: Asset = asset!("/assets/undertone_icon.svg");
@@ -27,7 +28,6 @@ fn main() {
 
 #[component]
 fn App() -> Element {
-
     // Shared UI State
     let mut connection_status = use_signal(|| "Disconnected".to_string());
 
@@ -35,16 +35,17 @@ fn App() -> Element {
     use_hook(|| {
         // Create channels for communication
         let (control_tx, control_rx) = mpsc::unbounded_channel::<ControlCommand>();
-        let (event_tx, mut event_rx) = mpsc::unbounded_channel::<ControlEvent>();
+        let (event_tx, mut event_rx) = mpsc::unbounded_channel::<UiEvent>();
         let (audio_tx, audio_rx) = unbounded();
 
         provide_context(control_tx);
         // Provide the control sender to the whole dioxus app.
-        std::thread::Builder::new().name("undertone-audio".into())
+        std::thread::Builder::new()
+            .name("undertone-audio".into())
             .spawn(move || {
                 audio::AudioEngine::new(audio_rx).run();
             })
-        .expect("Failed to spawn audio thread");
+            .expect("Failed to spawn audio thread");
 
         tokio::spawn(async move {
             control_connection::run_tcp_actor(control_rx, event_tx, audio_tx).await;
@@ -54,8 +55,8 @@ fn App() -> Element {
         spawn(async move {
             while let Some(event) = event_rx.recv().await {
                 match event {
-                    ControlEvent::StatusChanged(message) => connection_status.set(message),
-                    ControlEvent::ConnectionLost => connection_status.set("Disconnected".to_string()),
+                    UiEvent::ConnectionStatus(message) => connection_status.set(message),
+                    UiEvent::ConnectionLost => connection_status.set("Disconnected".to_string()),
                     _ => {}
                 }
             }
@@ -68,7 +69,6 @@ fn App() -> Element {
         document::Link { rel: "stylesheet", href: BASE_CSS}
         document::Link { rel: "stylesheet", href: COMPONENT_CSS }
 
-               // document::Link { rel: "stylesheet", href: TAILWIND_CSS }
         div{ "Welcome to the shit" }
         div{
             img { src: LOGO, class: "logo"}
