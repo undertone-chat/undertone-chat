@@ -10,20 +10,25 @@ In the world of online roleplay there are few free and flexible options for real
 It is difficult in this day and age to make promisses or commitments when technology and soci-econmic factors change so rapidly.  While I would love to make a guarentee or promise about a policy and stand by it for ever, it would be naive to do so knowing how important context when evaluating decisions about a product.  To that end I do want to set forth some values which can be used to guide the development and future decisions of Undertone.
 
 ### Privacy First
+
 Your right to privacy will always be a top priority for the developers and every reasonable effort will be made to ensure your personal information is never leaked or exposed.
 
 ### Ethical Finances
+
 Communities are the foundation of successful projects, and the community that Undertone is intended to serve often has to do a lot with very little, so you will never be charged to use the `Undertone Client` or `Undertone CLI Server` regardless of user counts so long as your community is not charging for access or play. For users or communities that charge for their services, they may license Undertone for reasonable flat fees.
 
 Finally **ANY** community that publically supports hate, discrimination or harm against any persons may have their access revoked.
 
 ### Open Access
+
 Undertone uses a copy left AGPL 3.0 [LICENSE](LICENSE) to ensure the product can remain free and any variations or forks of the project will carry that license forward. The intent is that what ever has been learned and created during the development of this product was done on the backs of giants using software and knowledge that has been freely shared and distributed without bias.  Therefor the product of those things should also remain freely available to use and learn from.
 
 ### Do No Harm
+
 At the time of writing this, the idea of Do No Harm as a developer and company was front and center in the zeitgeist. It is a fundamental beleif that as the creators of ideas and products it is on us to make choices in how our products and resources may be used to help prevent harm to others, regardless of if they use the products or not. In the case of community based software this is especially important as the free and privacy first nature of Undertone may be very appealing to those who actively harm others. To combat those individuals several tools will be put into place to control the ability to use the software for harmm without exposing normal users data or privacy.
 
 ## Features of Undertone
+
 This is a non-exhaustive list of features that we hope will be present by the 1.0 release of Undertone. We will not  be attaching dates or version targets for the features to ensure development can proceed in a way that is healthy and
  organic without artificial deadlines.
 
@@ -109,4 +114,3 @@ To handle any messaging between clients and server that must be reliable a TCP/I
 #### Voice & Data Layer
 
 To enable high speed low overhead transmission of time critical but unreliable information Undertone uses a UDP layer which transmits voice packets that can contain meta data about the user's state while transmitting such as 3D position, effect parameterization and info about side traffic (radio or other non channel based communications)
-
