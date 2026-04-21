@@ -1,6 +1,6 @@
-use std::time::SystemTime;
-
+use chrono::{Utc, rkyv::ArchivedUtc};
 use rkyv::{Archive, Deserialize, Serialize, rancor::Error, util::AlignedVec, with::AsUnixTime};
+use std::fmt;
 
 #[derive(Archive, Serialize, Deserialize, Debug)]
 pub struct ControlPacket {
@@ -13,8 +13,17 @@ pub struct ControlHeader {
     version: u16,
     request_id: u64,
     require_ack: bool,
-    #[rkyv(with = AsUnixTime)]
-    time: SystemTime,
+    time: chrono::rkyv::ArchivedDateTime<ArchivedUtc>,
+}
+
+impl fmt::Display for ControlHeader {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "request_id: {}, required_ack: {}, time_sent: {}",
+            self.request_id, self.require_ack, self.time
+        )
+    }
 }
 
 #[derive(Archive, Serialize, Deserialize, Debug)]
@@ -45,7 +54,12 @@ impl ControlPacket {
 }
 
 impl ControlHeader {
-    pub fn new(version: u16, request_id: u64, require_ack: bool, time: SystemTime) -> Self {
+    pub fn new(
+        version: u16,
+        request_id: u64,
+        require_ack: bool,
+        time: chrono::DateTime<Utc>,
+    ) -> Self {
         Self {
             version,
             request_id,

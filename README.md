@@ -14,7 +14,7 @@ Undertone is a community tool, built and maintained by the community and will al
 
 ## Project Dependencies
 
-Every great project is built on the backs of giants who came before it. Undertone is no different, though we strive to minimize the amount of dependcies to keep the project sleek and light weight, it would be irresponsibile to not re-invent every wheel we need when solutions already exist.  This list is non-exaughstive and can and will change over the lifetime of the project. For version specific dependencies be sure to check the CHANGELOG.
+Every great project is built on the backs of giants who came before it. Undertone is no different, though we strive to minimize the amount of dependencies to keep the project sleek and light weight, it would be irresponsible to re-invent every wheel we need when solutions already exist.  This list is non-exhaustive and can and will change over the lifetime of the project. For version specific dependencies be sure to check the CHANGELOG.
 
 ### Global
 
@@ -37,47 +37,11 @@ Crate only dependencies that may also represent sub-level separation not noted h
 - [tokio](https://tokio.rs/) - Async Networking and thread handling.
 ### Client
 
-- [Tauri](https://v2.tauri.app/) - Webview front end for the client, work happens in rust thread with UI information and commands being passed between UI thread and rust thread.
+- [Dioxus](https://dioxuslabs.com/) - Rust centric cross platform framework that leverages the power of webview (or native eventual) rendering.  Tightly coupled to rust it allows us to keep our focus in one primary language and share code more easily.
 
 ### Server
 
 *TBD*
-
-## Project Structure
-
-```
-.
-├── apps
-│   └── undertone-client
-│       ├── index.html
-│       ├── package.json
-│       ├── public
-│       ├── README.md
-│       ├── src
-│       ├── src-tauri
-│       │   ├── Cargo.toml
-│       │   ├── src
-│       │   │   ├── lib.rs
-│       │   │   └── main.rs
-│       │   └── tauri.conf.json
-│       ├── tsconfig.json
-│       ├── tsconfig.node.json
-│       └── vite.config.ts
-├── Cargo.toml
-├── crates
-│   └── undertone-common
-│       ├── Cargo.toml
-│       └── src
-│           ├── lib.rs
-│           └── protocol
-│               ├── control
-│               │   ├── base.rs
-│               │   └── mod.rs
-│               ├── mod.rs
-│               └── session.rs
-├── LICENSE
-└── README.md
-```
 
 ## Networking
 

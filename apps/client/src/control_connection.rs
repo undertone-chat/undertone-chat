@@ -1,12 +1,15 @@
 use crossbeam_channel::Sender as CrossbeamSender;
 use dioxus::hooks::UnboundedReceiver;
+use dioxus::html::body;
 use dioxus::prelude::Signal;
 use dioxus::signals::WritableExt;
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use tokio::net::TcpStream;
 use tokio::sync::mpsc::{self, UnboundedReceiver, UnboundedSender};
 use undertone_common::AlignedVec;
-use undertone_common::protocol::control::{ControlPacket, decode_packet, encode_packet};
+use undertone_common::protocol::control::{
+    ControlBody, ControlPacket, decode_packet, encode_packet,
+};
 
 use crate::audio::AudioCommand;
 use crate::ui_events::UiEvent;
@@ -151,6 +154,22 @@ async fn run_session(
     }
 
     let _ = event_tx.send(UiEvent::ConnectionLost);
+}
+
+/// Handles the incoming control packet and route accordingly.
+async fn handle_inbound_packet(
+    packet: ControlPacket,
+    event_tx: &UnboundedSender<UiEvent>,
+    audio_tx: &CrossbeamSender<AudioCommand>,
+) {
+    tracing::debug!("Handling Packet: {:?}", packet);
+
+    match packet.body() {
+        ControlBody::KeepAlive => {}
+        any => {
+            tracing::warn!("Unhandled Control Packet: {} ()")
+        }
+    }
 }
 
 async fn write_packet<W>(writer: &mut W, packet: &ControlPacket) -> std::io::Result<()>

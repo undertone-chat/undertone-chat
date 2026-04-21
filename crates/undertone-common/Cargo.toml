@@ -9,3 +9,4 @@ publish = false
 [dependencies]
 rkyv = "0.8.15"
 thiserror.workspace = true
+chrono.workspace = true
