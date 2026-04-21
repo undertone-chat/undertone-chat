@@ -27,28 +27,28 @@ At the time of writing this, the idea of Do No Harm as a developer and company w
 This is a non-exhaustive list of features that we hope will be present by the 1.0 release of Undertone. We will not  be attaching dates or version targets for the features to ensure development can proceed in a way that is healthy and
  organic without artifical deadlines.
 
-- [ ] *End to end encryption* (E2E): Everything from your voice to login data and chat will be encrypted E2E, even we wont know what you are saying!
-- [ ] *Hierarchal Role Based Access Control* (RBAC) for users.
-- [ ] *Voice Chat*: This is the core of the project and its main intended use.
-    - [ ] *Channels* - Server Admins may create channels for users to chat in using voice or text messaging.
-    - [ ] *Submix* - Communication with users outside of channels using subscription based packet routing and policies. These will be the backbone of things like radios, whispers or even supenatural communications.
-    - [ ] Positional - Allow mixing sources in channels and sub mixes so they appear to emit from 3D space around the listener by attaching coordinates to the voice packet.
-    - [ ] Effects - Allow data driven effect chains to change EQ, reverb and other audio effects on a per source basis.
-- [ ] Cross Plaform Desktop Client - Built on Dioxus, rust and modern CSS.
-- [ ] Cross Plaform CLI Server - Built on rust cause its damn cool.
-- [ ] Server Manager - Web based server management tool.
-- [ ] Text based chat channels.
-- [ ] Forum / Thread channels.
-- [ ] Authorization - Provide optional authorization tools to control user access and privledge
-    - [ ] OAuth - Allow users to register on your server using OAuth providers like other voice softwares that shall remain nameless.
-    - [ ] Email & Password - A very simple auth system to allow for basic login and account control using a users email and password as authentication tokens.
-    - [ ] 2FA - Enable two factor authentication for extra security and to help users protect their accounts.
-- [ ] *Lua Scripting* - MLUA with LuaJIT compilation for fast, familiar and reliable extension. This should enable polling of games and other API's to provide data for Undertone's data driven voice pipeline.
-- [ ] *Data API* - `Undertone Client` exposes a slim API to allow games to be modded and transmit information to the client which may be encoded.
-- [ ] Persistent storage options:
-    - [ ] *Key Value Pair* (Plain Text) - The simplest form of database using a plain text flat file to store user and server data.  Can become slow and cumbersome quickly, but good for testing and base functionality.
-    - [ ] *Key Value Pair* (Binary) - using binary KVP storage and efficient libraries the file remains local to the server but is in encrypted.
-    - [ ] Database Adapter - Adapters for common databases:
+- [ ] **End to End Encryption** (E2E): Everything from your voice to login data and chat will be encrypted E2E, even we wont know what you are saying!
+- [ ] **Hierarchal Role Based Access Control** (RBAC) for users.
+- [ ] **Voice Chat**: This is the core of the project and its main intended use.
+    - [ ] **Channels** - Server Admins may create channels for users to chat in using voice or text messaging.
+    - [ ] **Submix** - Communication with users outside of channels using subscription based packet routing and policies. These will be the backbone of things like radios, whispers or even supenatural communications.
+    - [ ] **Positional** - Allow mixing sources in channels and sub mixes so they appear to emit from 3D space around the listener by attaching coordinates to the voice packet.
+    - [ ] **Effects** - Allow data driven effect chains to change EQ, reverb and other audio effects on a per source basis.
+- [ ] **Cross Plaform Desktop Client** - Built on Dioxus, rust and modern CSS.
+- [ ] **Cross Plaform CLI Server** - Built on rust cause its damn cool.
+- [ ] **Server Manager** - Web based server management tool.
+- [ ] **Text Channels** - for text based communication and messaging.
+- [ ] **Forum / Thread** channels.
+- [ ] **Authorization** - Provide optional authorization tools to control user access and privledge
+    - [ ] **OAuth** - Allow users to register on your server using OAuth providers like other voice softwares that shall remain nameless.
+    - [ ] **Email** & Password - A very simple auth system to allow for basic login and account control using a users email and password as authentication tokens.
+    - [ ] **2FA** - Enable two factor authentication for extra security and to help users protect their accounts.
+- [ ] **Lua Scripting** - MLUA with LuaJIT compilation for fast, familiar and reliable extension. This should enable polling of games and other API's to provide data for Undertone's data driven voice pipeline.
+- [ ] **Data API** - `Undertone Client` exposes a slim API to allow games to be modded and transmit information to the client which may be encoded.
+- [ ] **Persistent ServerStorage**:
+    - [ ] **Key Value Pair** (Plain Text) - The simplest form of database using a plain text flat file to store user and server data.  Can become slow and cumbersome quickly, but good for testing and base functionality.
+    - [ ] **Key Value Pair** (Binary) - using binary KVP storage and efficient libraries the file remains local to the server but is in encrypted.
+    - [ ] **Database Adapter** - Adapters for common databases:
         - [ ] `MongoDB` A very popular NoSQL document storage database.
         - [ ] `PostgreSQL` Cornerstone of relational data.
         - [ ] `MySql` / `MariaDb` The ultimate opensource DB.
