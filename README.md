@@ -25,24 +25,27 @@ At the time of writing this, the idea of Do No Harm as a developer and company w
 
 ## Features of Undertone
 This is a non-exhaustive list of features that we hope will be present by the 1.0 release of Undertone. We will not  be attaching dates or version targets for the features to ensure development can proceed in a way that is healthy and
- organic without artifical deadlines.
+ organic without artificial deadlines.
 
-- [ ] **End to End Encryption** (E2E): Everything from your voice to login data and chat will be encrypted E2E, even we wont know what you are saying!
+- [ ] **End to End Encryption** (E2E): Everything from your voice to login data and chat will be encrypted E2E, even *we* won't know what you are saying!
+- [ ] **User Authorization** - Provide optional authorization tools to control user access and privledge
+    - [ ] **Email** & Password - A very simple auth system to allow for basic login and account control using a users email and password as authentication tokens.
+    - [ ] **OAuth** - Allow users to register on your server using OAuth providers like other voice softwares that shall remain nameless.
+    - [ ] **2FA** - Enable two factor authentication for extra security and to help users protect their accounts.
 - [ ] **Hierarchal Role Based Access Control** (RBAC) for users.
 - [ ] **Voice Chat**: This is the core of the project and its main intended use.
     - [ ] **Channels** - Server Admins may create channels for users to chat in using voice or text messaging.
     - [ ] **Submix** - Communication with users outside of channels using subscription based packet routing and policies. These will be the backbone of things like radios, whispers or even supenatural communications.
     - [ ] **Positional** - Allow mixing sources in channels and sub mixes so they appear to emit from 3D space around the listener by attaching coordinates to the voice packet.
     - [ ] **Effects** - Allow data driven effect chains to change EQ, reverb and other audio effects on a per source basis.
+    - [ ] **Server Codec Tuning** Servers may set required or maximum codec hints to control bandwidth and latency for users.
+    - [ ] **Client Codec Tuning** - Clients will adjust their  encoding based on connection metrics to avoid quality issues.
+    - [ ] **Opus Codec** - Tried and true foundation.
 - [ ] **Cross Plaform Desktop Client** - Built on Dioxus, rust and modern CSS.
 - [ ] **Cross Plaform CLI Server** - Built on rust cause its damn cool.
 - [ ] **Server Manager** - Web based server management tool.
 - [ ] **Text Channels** - for text based communication and messaging.
 - [ ] **Forum / Thread** channels.
-- [ ] **Authorization** - Provide optional authorization tools to control user access and privledge
-    - [ ] **OAuth** - Allow users to register on your server using OAuth providers like other voice softwares that shall remain nameless.
-    - [ ] **Email** & Password - A very simple auth system to allow for basic login and account control using a users email and password as authentication tokens.
-    - [ ] **2FA** - Enable two factor authentication for extra security and to help users protect their accounts.
 - [ ] **Lua Scripting** - MLUA with LuaJIT compilation for fast, familiar and reliable extension. This should enable polling of games and other API's to provide data for Undertone's data driven voice pipeline.
 - [ ] **Data API** - `Undertone Client` exposes a slim API to allow games to be modded and transmit information to the client which may be encoded.
 - [ ] **Persistent ServerStorage**:
@@ -55,33 +58,41 @@ This is a non-exhaustive list of features that we hope will be present by the 1.
 
 ## Project Dependencies
 
-Every great project is built on the backs of giants who came before it. Undertone is no different, though we strive to minimize the amount of dependencies to keep the project sleek and light weight, it would be irresponsible to re-invent every wheel we need when solutions already exist.  This list is non-exhaustive and can and will change over the lifetime of the project. For version specific dependencies be sure to check the CHANGELOG.
+Every great project is built on the backs of giants who came before it. Undertone is no different, though we strive to minimize the amount of dependencies to keep the project sleek and light-weight, it would be irresponsible to re-invent every wheel we need when solutions already exist.  This list is non-exhaustive and can and will change over the lifetime of the project. For version specific dependencies be sure to check the CHANGELOG.
 
-### Global
+### [rkyv](https://crates.io/crates/rkyv)
 
-Dependencies called globally between crates and applications.
+Provides a serialization framework that allows typical type safe serialization across boundaries as well as zero-copy extremely fast archive access for time and memory critical operations such as audio packet processing.
 
-- [rkyv](https://crates.io/crates/rkyv) - for serialization of data structures across the project with blazing fast zero copy access.
-- [rkyv-dyn](https://crates.io/crates/rkyv-dyn) - allow trait serialization.
-- [flyweights](https://crates.io/crates/flyweights) - Interning string allocations for user strings.
+### [flyweights](https://crates.io/crates/flyweights)
 
-### Crates
+Interning string allocations for user strings.
 
-Crate only dependencies that may also represent sub-level separation not noted here when crate specific.
+### [thiserror](https://crates.io/crates/thiserror)
 
-- [thiserror](https://crates.io/crates/thiserror) - macros to assist in effective error type creations.
-- chrono - Time keeping with rkyv compatible  Archive shapes for transmission and storage.
-### Application
+Provides macros to assist in effective error type creations, especially in crates/libraries shared between Undertone applications.
 
-- [anyhow](https://crates.io/crates/anyhow) - Easier error handling in application environments.
-- [tokio](https://tokio.rs/) - Async Networking and thread handling.
-### Client
+### [chrono]()
 
-- [Dioxus](https://dioxuslabs.com/) - Rust centric cross platform framework that leverages the power of webview (or native eventual) rendering.  Tightly coupled to rust it allows us to keep our focus in one primary language and share code more easily.
+Time keeping with rkyv compatible Archive shapes for transmission and storage. Supports 64-bit, 32-bit or 16-bit rkyv formats allowing some flexibility during development to tune their use on the wire.
 
-### Server
+*note*: any sequence timings requiring 65-bit uint may be transmitted as raw (since server started) or other monotic epocs, allowing us to use lower bit versions for transmitting date/times that are non critical but frequent.  TBD.
 
-*TBD*
+### [anyhow](https://crates.io/crates/anyhow)
+
+Easier dynamic error handling in application environments when strict entry per error is burdensome.
+
+### [tokio](https://tokio.rs/)
+
+Async Networking and thread handling used in just about every part of Undertone in some way.
+
+### [Dioxus](https://dioxuslabs.com/)
+
+Rust centric cross platform framework that leverages the power of webview (or native eventual) rendering.  Tightly coupled to rust it allows us to keep our focus in one primary language and share code more easily. Building with Dioxus will also allow us to share components and code with web and mobile versions of future applications.
+
+### [ractor](https://docs.rs/ractor/latest/ractor/)
+
+Rust implementation of the Erlang actor framework. Especially targeted for the back end where many processess need to be spawned,  managed and able to communicate with others without the built in chaos of constant borrowing and locking. Using channels and events to communicate this framework is ideal for intensive fast paced back ends and enabled distributed processes (allowing load balancing without increasing complexity of communication between processes).
 
 ## Networking
 
