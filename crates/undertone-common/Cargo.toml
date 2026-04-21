@@ -7,6 +7,6 @@ license = "AGPL-3.0"
 publish = false
 
 [dependencies]
-rkyv = "0.8.15"
+rkyv = {version="0.8.15", features=["little_endian", "aligned", "uuid-1"] }
+
 thiserror.workspace = true
-chrono.workspace = true
