@@ -1,6 +1,6 @@
 use std::time::SystemTime;
 
-use rkyv::{Archive, Deserialize, Serialize, with::AsUnixTime};
+use rkyv::{Archive, Deserialize, Serialize, rancor::Error, util::AlignedVec, with::AsUnixTime};
 
 #[derive(Archive, Serialize, Deserialize, Debug)]
 pub struct ControlPacket {
@@ -34,6 +34,14 @@ impl ControlPacket {
     pub fn new(header: ControlHeader, body: ControlBody) -> Self {
         Self { header, body }
     }
+
+    pub fn header(&self) -> &ControlHeader {
+        &self.header
+    }
+
+    pub fn body(&self) -> &ControlBody {
+        &self.body
+    }
 }
 
 impl ControlHeader {
@@ -45,4 +53,15 @@ impl ControlHeader {
             time,
         }
     }
+}
+
+/// Encode a ControlPacket into aligned bytes.
+pub fn encode_packet(packet: &ControlPacket) -> AlignedVec {
+    // encode the packet!
+    rkyv::to_bytes::<Error>(packet).unwrap()
+}
+
+/// Decode a ControlPacket safely with checks using aligned bytes.
+pub fn decode_packet(bytes: &AlignedVec) -> ControlPacket {
+    rkyv::from_bytes::<ControlPacket, Error>(bytes).unwrap()
 }
