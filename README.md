@@ -72,7 +72,7 @@ Interning string allocations for user strings.
 
 Provides macros to assist in effective error type creations, especially in crates/libraries shared between Undertone applications.
 
-### [chrono]()
+### [chrono](https://docs.rs/chrono/latest/chrono/)
 
 Time keeping with rkyv compatible Archive shapes for transmission and storage. Supports 64-bit, 32-bit or 16-bit rkyv formats allowing some flexibility during development to tune their use on the wire.
 
@@ -110,35 +110,3 @@ To handle any messaging between clients and server that must be reliable a TCP/I
 
 To enable high speed low overhead transmission of time critical but unreliable information Undertone uses a UDP layer which transmits voice packets that can contain meta data about the user's state while transmitting such as 3D position, effect parameterization and info about side traffic (radio or other non channel based communications)
 
-### Control Protocol
-
-#### CommandAck
-
-Used when a command requires specific acknowledgement with potential additional data from either the server or client.
-
-```rust
-struct CommandAck {
-status: CommandStatus,
-command_id: u32,
-command_type: CommandType,
-}
-```
-
-#### KeepAlive
-
-Ping from the server to a client to keep the connection open and ensure client is healthy.  Expected response is `CommandAck`.
-
-```rust
-struct KeepAlive { }
-```
-
-#### ClientInfo
-
-A data shape containing information about a client and their status. Typically used when client connects, their status changes or information is requested by another client.
-
-```rust
-struct ClientInfo {
-    display_name: String,
-    connected_at: TimeStamp, // Seconds since midnight UTC
-    }
-```
