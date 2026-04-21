@@ -77,12 +77,6 @@ Interning string allocations for user strings.
 
 Provides macros to assist in effective error type creations, especially in crates/libraries shared between Undertone applications.
 
-### [chrono](https://docs.rs/chrono/latest/chrono/)
-
-Time keeping with rkyv compatible Archive shapes for transmission and storage. Supports 64-bit, 32-bit or 16-bit rkyv formats allowing some flexibility during development to tune their use on the wire.
-
-*note*: any sequence timings requiring 65-bit uint may be transmitted as raw (since server started) or other monotic epocs, allowing us to use lower bit versions for transmitting date/times that are non critical but frequent.  TBD.
-
 ### [anyhow](https://crates.io/crates/anyhow)
 
 Easier dynamic error handling in application environments when strict entry per error is burdensome.

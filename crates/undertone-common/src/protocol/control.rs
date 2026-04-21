@@ -49,6 +49,7 @@ impl fmt::Display for ArchivedControlHeader {
     }
 }
 
+/// Represents the type of control message body to enable easier decoding of rkyv.
 #[derive(Archive, Serialize, Deserialize, Debug)]
 #[repr(u16)]
 pub enum ControlBody {
@@ -56,7 +57,7 @@ pub enum ControlBody {
     KeepAlive = 2,
 }
 
-/// Response Acknowledgement body for commands requiring ack.
+/// Response acknowledgment body for commands requiring ACK.
 #[derive(Archive, Serialize, Deserialize, Debug)]
 pub struct Ack {
     /// The original request_id from the `ControlHeader`.
@@ -67,14 +68,17 @@ pub struct Ack {
 }
 
 impl ControlPacket {
+    /// Create a new control packet with associated body.
     pub fn new(header: ControlHeader, body: ControlBody) -> Self {
         Self { header, body }
     }
 
+    /// Borrow the header.
     pub fn header(&self) -> &ControlHeader {
         &self.header
     }
 
+    /// Borrow the body.
     pub fn body(&self) -> &ControlBody {
         &self.body
     }
