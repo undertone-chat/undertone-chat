@@ -47,14 +47,6 @@ fn App() -> Element {
             })
             .expect("Failed to spawn audio thread");
 
-        // Spawn control thread for incoming and outgoing control connection stuff.
-        tokio::spawn(async move {
-            ControlConnection::new(control_rx, event_tx, audio_tx)
-                .run()
-                .await;
-            // control_connection::run_tcp_actor(control_rx, event_tx, audio_tx).await;
-        });
-
         // Bridge to listen for events.
         spawn(async move {
             while let Some(event) = event_rx.recv().await {

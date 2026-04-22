@@ -1,5 +1,5 @@
 [package]
-name = "undertone-common"
+name = "undertone-serialization"
 version = "0.1.0"
 authors = ["Victoria Beauray Sagady <victoria@victoriabsagady.com>"]
 edition = "2024"
@@ -7,6 +7,7 @@ license = "AGPL-3.0"
 publish = false
 
 [dependencies]
-rkyv = {version="0.8.15", features=["little_endian", "aligned", "uuid-1"] }
-
+rkyv = {version="~0.8.15", features=["little_endian", "aligned", "uuid-1"] }
+bitflags = "=2.11.1"
+uuid = {version="=1.23.1", features=["v7","v5"]}
 thiserror.workspace = true

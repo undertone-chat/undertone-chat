@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["crates/undertone-common", "apps/server", "apps/client"]
+members = ["crates/undertone-serialization", "apps/server", "apps/client"]
 
 [workspace.dependencies]
 log = "0.4.29"
@@ -9,5 +9,5 @@ tracing = "0.1.44"
 tracing-subscriber = "0.3.23"
 thiserror = "2.0.18"
 tokio = {version="1.52.0" , features=["full"]}
-undertone-common = { path = "crates/undertone-common"}
+undertone-serialization = { path = "crates/undertone-serialization"}
 chrono = {version="0.4.44", features=["rkyv-32"]}

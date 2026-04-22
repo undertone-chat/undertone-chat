@@ -14,7 +14,8 @@ tracing-subscriber.workspace = true
 addr = "0.15.6"
 crossbeam-channel = "0.5.15"
 tokio.workspace = true
-undertone-common.workspace = true
+undertone-serialization.workspace = true
+
 [features]
 default = ["desktop"]
 web = ["dioxus/web"]

@@ -1,14 +1,14 @@
 [package]
-name = "undertone-server"
+name = "undertone-cli-server"
 version = "0.1.0"
 authors = ["Victoria Beauray Sagady <cephypi@pm.me>"]
 license = "AGPL-3.0"
-description = "Undertone backend server"
+description = "Undertone voice chat server run from the command line."
 publish = false
 edition = "2024"
 
 [dependencies]
-undertone-common.workspace = true
+undertone-serialization.workspace = true
 anyhow.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
