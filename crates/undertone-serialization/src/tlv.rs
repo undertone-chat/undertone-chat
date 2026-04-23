@@ -1,3 +1,5 @@
+mod coordinate;
+mod pad1;
 mod pad2;
 
 use crate::error::TlvError;
@@ -23,6 +25,7 @@ enum Tag {
     Empty = 0,
     Pad1 = 1, // 1 byte pad for alignment
     Pad2 = 2,
+    Coordinate = 3,
 }
 
 impl TryFrom<u16> for Tag {
@@ -33,57 +36,20 @@ impl TryFrom<u16> for Tag {
             x if x == Tag::Empty as u16 => Ok(Tag::Empty),
             x if x == Tag::Pad1 as u16 => Ok(Tag::Pad1),
             x if x == Tag::Pad2 as u16 => Ok(Tag::Pad2),
+            x if x == Tag::Coordinate as u16 => Ok(Tag::Coordinate),
             _ => Err(TlvError::InvalidTag(v)),
         }
     }
 }
-/// Expected Tlv shape is
-/// ```
-///  tag  size data
-/// [u16][u16][Bytes]
-/// ```
-/// where data length (bytes) = size
+
 trait Tlv {
     const SIZE: u16;
-    fn tag(&self) -> Tag;
+    const TAG: Tag;
     fn size(&self) -> u16;
     fn encode(&self) -> Result<Bytes, TlvError>;
     fn decode(buf: Bytes) -> Result<Self, TlvError>
     where
         Self: std::marker::Sized;
-}
-
-#[derive(Debug, Default, PartialEq, Eq)]
-struct Pad1 {
-    data: u8,
-}
-
-impl Tlv for Pad1 {
-    const SIZE: u16 = 1;
-
-    fn tag(&self) -> Tag {
-        Tag::Pad1
-    }
-
-    fn size(&self) -> u16 {
-        Self::SIZE
-    }
-
-    fn encode(&self) -> Result<Bytes, TlvError> {
-        // Encode our value.
-        let value_buf = self.data.to_le_bytes().to_vec();
-        encode_tlv(Tag::Pad1, Self::SIZE, value_buf)
-    }
-
-    fn decode(buf: Bytes) -> Result<Self, TlvError> {
-        let mut frame = decode_tlv(buf)?;
-        let value = match frame.data.try_get_u8() {
-            Ok(v) => v,
-            Err(error) => return Err(TlvError::TryGetError(error)),
-        };
-
-        Ok(Pad1 { data: value })
-    }
 }
 
 fn encode_tlv(tag: Tag, size: u16, data: Vec<u8>) -> Result<Bytes, TlvError> {
@@ -109,7 +75,7 @@ fn encode_tlv(tag: Tag, size: u16, data: Vec<u8>) -> Result<Bytes, TlvError> {
 fn decode_tlv(mut buf: Bytes) -> Result<TlvFrame, TlvError> {
     if buf.len() < TLV_TAG_SIZE + TLV_SIZE_SIZE {
         return Err(TlvError::MinimumLength {
-            expected: 8u16,
+            expected: (TLV_TAG_SIZE + TLV_SIZE_SIZE) as u16,
             got: buf.len(),
         });
     }
@@ -144,18 +110,43 @@ fn decode_tlv(mut buf: Bytes) -> Result<TlvFrame, TlvError> {
     })
 }
 
+#[allow(unused)]
+macro_rules! tlv_tests {
+    ($($name:ident: $type:ty,)*) => {
+        $(
+            mod $name {
+                use super::*;
+
+                #[test]
+                fn round_trip() {
+                    let tlv = <$type>::default();
+                    let buf = tlv.encode().unwrap();
+                    let decoded = <$type>::decode(buf).unwrap();
+                    assert_eq!(tlv,decoded);
+                }
+            }
+            )*
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::tlv::{coordinate::Coordinate, pad1::Pad1, pad2::Pad2};
+
+    tlv_tests! {
+        pad1: Pad1,
+        pad2: Pad2,
+        coordinate: Coordinate,
+    }
 
     #[test]
-    fn tlv_round_trip() {
-        let pad1 = Pad1 { data: 69 };
-        let buf_result = pad1.encode();
-        assert!(buf_result.is_ok());
-        let buf = buf_result.unwrap();
+    fn encode_fails_on_wrong_size() {
+        assert!(encode_tlv(Tag::Pad1, 69, [0u8; 1].to_vec()).is_err());
+    }
 
-        let result = Pad1::decode(buf).unwrap();
-        assert_eq!(pad1, result);
+    #[test]
+    fn decode_fails_on_too_small() {
+        assert!(decode_tlv(Bytes::from([0u8; 1].to_vec())).is_err());
     }
 }

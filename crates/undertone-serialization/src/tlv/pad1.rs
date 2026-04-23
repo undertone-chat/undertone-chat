@@ -1,11 +1,11 @@
 use super::*;
-#[derive(Default, Debug, PartialEq, Eq)]
-pub struct Pad2 {
-    data: u16,
+#[derive(Debug, Default, PartialEq, Eq)]
+pub struct Pad1 {
+    data: u8,
 }
 
-impl Tlv for Pad2 {
-    const SIZE: u16 = 2;
+impl Tlv for Pad1 {
+    const SIZE: u16 = 1;
     const TAG: Tag = Tag::Pad2;
 
     fn size(&self) -> u16 {
@@ -13,17 +13,18 @@ impl Tlv for Pad2 {
     }
 
     fn encode(&self) -> Result<Bytes, TlvError> {
-        let buf = self.data.to_be_bytes().to_vec();
-        encode_tlv(Pad2::TAG, self.size(), buf)
+        // Encode our value.
+        let value_buf = self.data.to_le_bytes().to_vec();
+        encode_tlv(Pad1::TAG, Self::SIZE, value_buf)
     }
 
     fn decode(buf: Bytes) -> Result<Self, TlvError> {
         let mut frame = decode_tlv(buf)?;
-        let value = match frame.data.try_get_u16() {
+        let value = match frame.data.try_get_u8() {
             Ok(v) => v,
             Err(error) => return Err(TlvError::TryGetError(error)),
         };
 
-        Ok(Pad2 { data: value })
+        Ok(Pad1 { data: value })
     }
 }
