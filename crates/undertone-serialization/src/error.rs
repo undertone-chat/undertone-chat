@@ -17,4 +17,7 @@ pub enum TlvError {
 
     #[error("Tlv minimum length not met. expected={expected:?} got={got:?}")]
     MinimumLength { expected: u16, got: usize },
+
+    #[error("Incomplete Tlv Header [tag:u16][size:u16]")]
+    IncompleteHeader,
 }
