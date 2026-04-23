@@ -28,6 +28,17 @@ enum Tag {
     Coordinate = 3,
 }
 
+impl Tag {
+    fn get_tlv_size(&self) -> u16 {
+        match self {
+            Tag::Empty => 0,
+            Tag::Pad1 => pad1::Pad1::SIZE,
+            Tag::Pad2 => pad2::Pad2::SIZE,
+            Tag::Coordinate => coordinate::Coordinate::SIZE,
+        }
+    }
+}
+
 impl TryFrom<u16> for Tag {
     type Error = TlvError;
 
@@ -110,6 +121,30 @@ fn decode_tlv(mut buf: Bytes) -> Result<TlvFrame, TlvError> {
     })
 }
 
+pub fn try_parse_frame_streaming(buf: &mut Bytes) -> Result<Option<TlvFrame>, TlvError> {
+    // Make sure there is something left in the buffer for us to evaluate, should at least be 8 bytes
+    // for tag and size. We may be waiting on stream to buffer as well so well just say nothin yet.
+    if buf.len() >= TLV_TAG_SIZE + TLV_SIZE_SIZE {
+        // Nope what ever is left is not for us.
+        return Ok(None);
+    }
+
+    let mut cur = buf.clone();
+
+    let raw_tag = cur.try_get_u16().map_err(|_| TlvError::IncompleteHeader)?;
+    let tag = Tag::try_from(raw_tag)?;
+
+    let size = cur.try_get_u16().map_err(|_| TlvError::IncompleteHeader)?;
+
+    if tag.get_tlv_size() != size {
+        return Err(TlvError::SizeMismatch {
+            expected: tag.get_tlv_size(),
+            got: size as usize,
+        });
+    }
+    // If so decode the tlv and return that.
+    None
+}
 #[allow(unused)]
 macro_rules! tlv_tests {
     ($($name:ident: $type:ty,)*) => {
