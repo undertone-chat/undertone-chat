@@ -56,3 +56,39 @@ impl Tlv for Coordinate {
         Ok(Coordinate { x, y, z })
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn should_return_eq() {
+        let a = Coordinate {
+            x: 0.1,
+            y: 0.2,
+            z: 0.3,
+        };
+        let b = Coordinate {
+            x: 0.1,
+            y: 0.1 + 0.1,
+            z: 0.0 + 0.3,
+        };
+
+        assert_eq!(a, b);
+    }
+
+    #[test]
+    fn should_return_neq() {
+        let a = Coordinate {
+            x: 0.1,
+            y: 0.1,
+            z: 0.1,
+        };
+        let b = Coordinate {
+            x: 0.1,
+            y: 0.1,
+            z: 0.1001,
+        };
+        assert_ne!(a, b);
+    }
+}
