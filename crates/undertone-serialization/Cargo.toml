@@ -11,3 +11,4 @@ rkyv = {version="~0.8.15", features=["little_endian", "aligned", "uuid-1"] }
 bitflags = "=2.11.1"
 uuid = {version="=1.23.1", features=["v7","v5"]}
 thiserror.workspace = true
+bytes="1.11.1"

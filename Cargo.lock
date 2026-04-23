@@ -5658,6 +5658,7 @@ name = "undertone-serialization"
 version = "0.1.0"
 dependencies = [
  "bitflags 2.11.1",
+ "bytes",
  "rkyv",
  "thiserror 2.0.18",
  "uuid",
