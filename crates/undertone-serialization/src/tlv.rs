@@ -121,11 +121,17 @@ fn decode_tlv(mut buf: Bytes) -> Result<TlvFrame, TlvError> {
     })
 }
 
+/// Attempt to extract a Tlv from the buffer if we are expecting some
+///
+/// Returns None if there are not enough bytes to extract a valid Tlv,
+/// does not mean there isn't one but we will let the calling code make that
+/// call.
 pub fn try_parse_frame_streaming(buf: &mut Bytes) -> Result<Option<TlvFrame>, TlvError> {
     // Make sure there is something left in the buffer for us to evaluate, should at least be 8 bytes
     // for tag and size. We may be waiting on stream to buffer as well so well just say nothin yet.
-    if buf.len() >= TLV_TAG_SIZE + TLV_SIZE_SIZE {
+    if buf.len() < TLV_TAG_SIZE + TLV_SIZE_SIZE {
         // Nope what ever is left is not for us.
+        println!("Returning none since buf.len isnt bigger than our min size!");
         return Ok(None);
     }
 
@@ -142,9 +148,21 @@ pub fn try_parse_frame_streaming(buf: &mut Bytes) -> Result<Option<TlvFrame>, Tl
             got: size as usize,
         });
     }
-    // If so decode the tlv and return that.
-    None
+    // If so we can try to pull out the data if there are enough bytes.
+
+    if cur.remaining() < size as usize {
+        println!("Not enough remaining buffer to get the data from.");
+        return Ok(None);
+    }
+
+    let data = cur.split_to(size as usize);
+
+    // Replace the previous handle with our new advanced handle so we don't lose our place.
+    *buf = cur;
+
+    Ok(Some(TlvFrame { tag, size, data }))
 }
+
 #[allow(unused)]
 macro_rules! tlv_tests {
     ($($name:ident: $type:ty,)*) => {
@@ -173,6 +191,38 @@ mod test {
         pad1: Pad1,
         pad2: Pad2,
         coordinate: Coordinate,
+    }
+
+    #[test]
+    fn can_extract_frames_from_stream() {
+        let mut raw = Vec::new();
+        raw.extend_from_slice(&encode_tlv(Tag::Pad1, Pad1::SIZE, [0u8; 1].to_vec()).unwrap());
+        raw.extend_from_slice(&encode_tlv(Tag::Pad2, Pad2::SIZE, [0u8; 2].to_vec()).unwrap());
+        let coordinate = Coordinate::new(0.1, 0.2, 0.3);
+        raw.extend_from_slice(
+            &encode_tlv(
+                Tag::Coordinate,
+                Coordinate::SIZE,
+                coordinate.to_be_bytes().to_vec(),
+            )
+            .unwrap(),
+        );
+
+        let mut read_buf = Bytes::from(raw);
+        let first_frame = try_parse_frame_streaming(&mut read_buf).unwrap().unwrap();
+        assert_eq!(first_frame.tag, Tag::Pad1);
+        let second_frame = try_parse_frame_streaming(&mut read_buf).unwrap().unwrap();
+        assert_eq!(second_frame.tag, Tag::Pad2);
+        let mut third_frame = try_parse_frame_streaming(&mut read_buf).unwrap().unwrap();
+        assert_eq!(third_frame.tag, Tag::Coordinate);
+        assert_eq!(third_frame.size, Coordinate::SIZE);
+        assert_eq!(
+            coordinate,
+            Coordinate::from_tlv_frame(&mut third_frame).unwrap()
+        );
+
+        // Ensure we actually consumed everything and nothing is dangling!
+        assert!(!read_buf.has_remaining());
     }
 
     #[test]

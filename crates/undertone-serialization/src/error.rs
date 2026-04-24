@@ -21,3 +21,9 @@ pub enum TlvError {
     #[error("Incomplete Tlv Header [tag:u16][size:u16]")]
     IncompleteHeader,
 }
+
+#[derive(Error, Debug)]
+pub enum SerializationError {
+    #[error("Failed to extract type={0} from buffer.")]
+    BufferTryGet(String),
+}

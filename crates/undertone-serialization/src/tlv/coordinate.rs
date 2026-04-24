@@ -1,7 +1,8 @@
+// use core::slice::SlicePattern;
+
 use super::*;
 #[derive(Debug, Default)]
 pub struct Coordinate {
-    // Stores f32 coordinates in bit form for network transport.
     x: f32,
     y: f32,
     z: f32,
@@ -16,28 +17,21 @@ impl PartialEq for Coordinate {
 
 impl Eq for Coordinate {}
 
-impl Coordinate {}
-
-impl Tlv for Coordinate {
-    const SIZE: u16 = 12;
-    const TAG: Tag = Tag::Coordinate;
-
-    fn size(&self) -> u16 {
-        Self::SIZE
+impl Coordinate {
+    pub fn new(x: f32, y: f32, z: f32) -> Self {
+        Self { x, y, z }
     }
 
-    fn encode(&self) -> Result<Bytes, TlvError> {
-        // Encode our value.
-        let mut buf = BytesMut::new();
+    pub fn to_be_bytes(&self) -> Bytes {
+        let mut buf = BytesMut::with_capacity(12);
         buf.put_f32(self.x);
         buf.put_f32(self.y);
         buf.put_f32(self.z);
-        //buf.freeze();
-        encode_tlv(Coordinate::TAG, Self::SIZE, buf.to_vec())
+
+        buf.freeze()
     }
 
-    fn decode(buf: Bytes) -> Result<Self, TlvError> {
-        let mut frame = decode_tlv(buf)?;
+    pub fn from_tlv_frame(frame: &mut TlvFrame) -> Result<Coordinate, TlvError> {
         let x = match frame.data.try_get_f32() {
             Ok(v) => v,
             Err(error) => return Err(TlvError::TryGetError(error)),
@@ -54,6 +48,31 @@ impl Tlv for Coordinate {
         };
 
         Ok(Coordinate { x, y, z })
+    }
+}
+
+impl Tlv for Coordinate {
+    const SIZE: u16 = 12;
+    const TAG: Tag = Tag::Coordinate;
+
+    fn size(&self) -> u16 {
+        Self::SIZE
+    }
+
+    fn encode(&self) -> Result<Bytes, TlvError> {
+        // Encode our value.
+        let mut buf = BytesMut::new();
+        buf.put_f32(self.x);
+        buf.put_f32(self.y);
+        buf.put_f32(self.z);
+
+        encode_tlv(Coordinate::TAG, Self::SIZE, buf.to_vec())
+    }
+
+    fn decode(buf: Bytes) -> Result<Self, TlvError> {
+        let mut frame = decode_tlv(buf)?;
+
+        Self::from_tlv_frame(&mut frame)
     }
 }
 
