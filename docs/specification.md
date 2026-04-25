@@ -1,78 +1,53 @@
 
-| Field | Information |
-|---:|---|
-|Prepared By| [Victoria Beauray Sagady](https://github.com/Cephy314)|
-|Reviewed By| None|
-|Created On| April 24th 2026|
-|Last Updated| April 24th 2026|
-
 
 # Undertone - Software Requirement Specification
 
+Real-time voice and text and communication software for role-play and sim communities.
+
+| Field | Information |
+|---:|---|
+| Title | Software Requirements Specification for Undertone |
+| Date | April 24th, 2026 |
+|Last Updated | April 24th 2026|
+| Status | Draft |
+
+
+***Glossary***
+| Term | Definition |
+| ---: | :--- |
+| AI | Artifical Intelligence |
+| API | Application Programming Interface |
+| Codec | Software component that compresses large audio or video data |
+| CRC | Cyclic Redundancy Check |
+| E2EE | End To End Encryption |
+| GDPR | General Data Protection Regulation |
+| MILSIM | Military Simulation roleplay |
+| Opus | A popular open source audio codec for real time communication |
+| QUIC | Quick UDP Internet Connection |
+| RBAC | Role Based Access Control |
+| RP | Role-Play or roleplaying |
+| Rust | Cross-Platform programming language |
+| Sim | A game or simulator that strives for realism |
+| SRS | System Requirements Specification |
+| TCP/IP | Transmission Control Protocol / Internet Protocol |
+| TLS | Transport Layer Security |
+| UDP | User Datagram Protocol |
+
 ## 1. Introduction
 
-### 1.1 Purpose
+### *1.1 Purpose*
+This Software Requirement Specification (SRS) document provides a description of the real time communication software Undertone being developed by [Cephy314](https://github.com/Cephy314). This document details the functional and nonfunctional requirements for the software, which aims to create a community controlled and focused product to allow a single product solution that is free to use.
 
-### 1.2 Intended Audience
+This SRS will serve as the foundation for the subsequent system design and development phases, ensuring that all stakeholders have a clear understanding of what the software will do and how it will operate.
 
-### 1.3 Intended Use
+### *1.2 Document Conventions*
 
-### 1.4 Product Scope
+This document follows these conventions:
+| Term | Definition |
+| --- | :--- |
+| ***SHALL*** | Refers to mandatory requirement that must be fulfilled during Phase 1 of development. The vendor / developer is required to cover this feature in the current implementation phase. |
+| ***SHOULD*** | Indicates a requirement that will take place in phase 2 and the developer should take it into consideration for future scalability. |
+| ***MAY*** | Refers to a requirement anticipated for phase 3 or subsequent phases. The developer is encouraged to consider this requirement generally, keeping future scalability in mind. |
+| ***TBD*** | To Be Determined, indicates information that is not yet available but will be provided in future versions. |
+| ***Note*** | Provides additional information or clarification. |
 
-### 1.5 Definitions and Acronyms
-
-## 2. Overall Description
-
-### 2.1 User Needs
-
-### 2.2 Assumptions and Dependencies
-
-## 3. System Features and Requirements
-
-### 3.1 Functional Requirements
-
-#### 3.1.1 Numbered and Described
-
-#### 3.1.2 EARS format: "When [event], the system shall [response]"
-
-#### 3.1.3 Include Specifications by Example or BDD format (e.g., Gherkin)
-
-### 3.2 Non-Functional Requirements
-
-#### 3.2.1 Performance (eg 95% of requests shal return in under 2 seconds)
-
-#### 3.2.2 Security (eg Only auth users can access admin api)
-
-#### 3.2.3 Usability, Reliability, Compliance
-
-### 3.3 External Interface Requirements
-
-#### 3.3.1 Performance Requirements
-
-#### 3.3.2 Safety Requirements
-
-#### 3.3.3 Security Requirements
-
-#### 3.3.4 Software Quality Attributes
-
-#### 3.3.5 Business Rules
-
-### 3.4 System Features
-
-## 4. Other Requirements
-
-### 4.1 Database Requirements
-
-### 4.2 Legal and Regulatory Requirements
-
-### 4.3 Internationalization and Localization
-
-### 4.4 Risk Management (FMEA Matrix)
-
-## 5. Appendicies
-
-### 5.1 Glossary
-
-### 5.2 Use Cases and Diagrams
-
-### 5.3 To Be Determined (TBD) List
