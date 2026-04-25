@@ -357,7 +357,7 @@ This section details the functional requirements of Undertone, organizaed by maj
 | FR-042 | The client ***SHALL*** support stale packet filtering |
 | FR-043 | The client ***SHALL*** support Accoustic Echo Cancellation |
 | FR-044 | The client and server ***SHALL*** support quality of service (QOS) tags (DSCP) via Differentiated Services (DiffServ) to market packets as high priority (e.g. EF - Expedited Forwarding) |
-| FR_057 | The client ***SHOULD*** support auto ducking of system audio when receiving audio |
+| FR-057 | The client ***SHOULD*** support auto ducking of system audio when receiving audio |
 | FR-058 | The client ***SHOULD*** allow users to be able to adjust the ducking threshold and level |
 | FR-059 | The client ***SHOULD*** support ducking of audio when user is transmitting. |
 
