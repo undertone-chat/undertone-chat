@@ -1,11 +1,14 @@
+mod config;
+
+use config::Settings;
 use std::str::from_utf8;
 
-use anyhow::Result;
+use anyhow::{Result, anyhow};
 use tokio::io::AsyncReadExt;
 use tokio::net::{TcpListener, TcpStream};
 use tokio::runtime::Builder;
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() -> Result<()> {
     // Setup tracing subscriber.
     tracing_subscriber::fmt::init();
 
@@ -17,6 +20,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         std::env::consts::FAMILY,
         std::env::consts::OS,
         std::env::consts::ARCH,
+    );
+
+    let settings = Settings::new()?;
+
+    tracing::debug!(
+        "Did we get anything? Name: {}, Description: {}",
+        settings.general.name,
+        settings.general.description
     );
 
     Ok(())
