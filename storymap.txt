@@ -7,10 +7,10 @@ Setup a server
             Upload community icon.
             Upload community banner
     Install the server
-        Install the server using package manager like cargo, brew, scoop.
         Download the server in an archive.
         Edit a configuration file that is read in on startup.
         Start my server and initialize databae for first time.
+          Install the server using package manager like cargo, brew, scoop.
 Use the client
     Install my client
         Get client installer from website or github.
