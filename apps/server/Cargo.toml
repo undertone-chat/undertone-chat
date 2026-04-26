@@ -13,3 +13,5 @@ anyhow.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
 tokio.workspace = true
+tokio-postgres = "0.7.17"
+ractor = "0.15.12"

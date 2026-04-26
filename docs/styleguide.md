@@ -1,3 +1,5 @@
+<div align="center"><img src="images/icon_1024x1024.png" width="30%"></div>
+
 # Undertone Style Guide v1.0
 This document notes core branding principals to ensure consistent styling across social media, websites, print and application.
 

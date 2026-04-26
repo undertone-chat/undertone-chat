@@ -1,3 +1,5 @@
+<div align="center"><img src="images/icon_1024x1024.png" width="30%"></div>
+
 # Undertone
 Undertone is a real time voice and chat solution designed with roleplay and gaming communities as its users. The specialized needs of various sim, roleplay, gaming communities are not properly met in any single application, and often require significant financial investment on the part of the community to enable the better solutions through plugins or licenses. Undertone is an open source community focused solution that enables the users to decide how to invest in their solutions via development using rust and OS/Hardware agnostic designs.
 
