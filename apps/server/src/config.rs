@@ -73,7 +73,7 @@ impl Settings {
             // Load standard  undertone config.
             .add_source(File::with_name("undertone").required(false))
             // Search for any specific configurations for run mode (eg. development or production)
-            .add_source(File::with_name(&format!("{run_mode}")).required(false))
+            .add_source(File::with_name(&run_mode.to_string()).required(false))
             // Load local file (Do not commit this to the repo, holds sensitive data)
             .add_source(File::with_name("local").required(false))
             // Load any and all environment variables prefixed with UNDERTONE
