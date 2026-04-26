@@ -81,13 +81,13 @@ struct Channel {
     children: HashMap<Uuid, &Channel>
     name: String,
     title: String,
-    permissions: HashMap<Uuid, u32>, // Role to Permission Bitfield mapping.
+    permissions: HashMap<Uuid, u32>, // Role to Permission Bit-field mapping.
 }
 ```
 
 ## Permissions
 
-Permissions are stored in a u32 bitfield (32 possible flags), with multiple fields to represent different permission groupings.  By nature the bitfield based RBAC permission system is addative, so rolls can only add permissions, while all permissions default to off, creating a waterfall effect.
+Permissions are stored in an u32 bit-field (32 possible flags), with multiple fields to represent different permission groupings. By nature the bit-field based RBAC permission system is additive, so rolls can only add permissions, while all permissions default to off, creating a waterfall effect.
 
 ```
  Rank   bits
@@ -98,7 +98,7 @@ Permissions are stored in a u32 bitfield (32 possible flags), with multiple fiel
 user  : 1101
 ```
 
-On some occasions we need a way to block permissions such as a suspended user or temporary mute. To achieve these we are able to place blocking or deny roles into the heirarchy which then uses its bits to negate any permissions below it when set.
+On some occasions we need a way to block permissions such as a suspended user or temporary mute. To achieve these we are able to place blocking or deny roles into the hierarchy which then uses its bits to negate any permissions below it when set.
 
 ```
  Rank   bits
@@ -110,11 +110,11 @@ On some occasions we need a way to block permissions such as a suspended user or
 user  : 1011
 ```
 
-In the above example the blocking role cancels the 3rd and 1st bits (bits go right to left) prevent role 3 from applying those permissions, but it does not block the 4th bit, so role 4 is allowed to apply its permission there, and role 1 which has priority over the blocking roll enables bits 1 and 2. The User struct stores the calculated bitfields for general permissions, voice permissions and text permissions. These are gained from roles and enable those permissions globaly, so should be assigned very carefully to prevent abuse by users.
+In the above example the blocking role cancels the 3rd and 1st bits preventing role 3 from applying those permissions. But it does not block the fourth bit, allowing it to apply its permission, and role one which has priority over the blocking roll enables bits one and two. The User struct stores the calculated bit-fields for general permissions, voice permissions and text permissions. These are gained from roles and enable those permissions globally, so should be assigned very carefully to prevent abuse by users.
 
-Per text channel and voice channel permissions store bitfields to mark permissions per role.  Generally most users roles should not enable permissions and instead roles should be granted through channel permissions as this provides much finer control.  To help managing all the channel based permissions they are automatically inherited from parent channel and categories. You may set whether a permission is inherited per channel in which case it will only evaluate that bit based on its own role permissions. Also worth noting a channel may enable defaults on permissions as well to provide permissions if someone doesnt have a matching role.
+Per text channel and voice channel permissions store bit-fields to mark permissions per role. Generally most users roles should not enable permissions and instead roles should be granted through channel permissions as this provides much finer control. To help managing all the channel based permissions they are automatically inherited from parent channel and categories. You may set whether a permission is inherited per channel in which case it will only evaluate that bit based on its own role permissions. Also worth noting a channel may enable defaults on permissions as well to provide permissions if someone doesn't have a matching role.
 
-To enable faster calculations all permissions are calculated and cached into single bitfields on the user for their per channel permissions.  This avoids evaluating the roles every time a permission must be checked, though any change in role or permissions on the user, role config or channel will invalidate that cache and trigger a re-calculation. Caches also do not survive disconnect and will be re-calculated on each connection to avoid mismatch for changes that occur when a user is offline.
+To enable faster calculations all permissions are calculated and cached into single bit-fields on the user for their per channel permissions. This avoids evaluating the roles every time a permission must be checked, though any change in role or permissions on the user, role configuration or channel will invalidate that cache and trigger a recalculation. Caches also do not survive disconnect and will be recalculated on each connection to avoid mismatch for changes that occur when a user is offline.
 
 ```rust
 struct PermissionCache {
@@ -182,14 +182,14 @@ struct PermissionCache {
 | 16 | ATTACH_LINK |
 | 17 | SET_SLOW_MODE |
 | 18 | IGNORE_SLOW_MODE |
-| 19 | SET_MIN_ROLE_SPEAK |
+| 19 | SET_SPEAKING_ROLE_REQUIREMENT |
 
 
 ## Networking
 
-Undertone is a remote server and client system for voice communication over the network. At the core of the network protocol are two categories of message types: `Ephemeral` and `Reliable`. These represent the data's need for guarenteed delivery and resistence to packet loss and corruption. A `Reliable` packet is used for things like control, chat, state updates for users on the server etc, when we want to be sure they arrive and and if they dont they get resent. `Ephemeral` messages are designed to carry frequently broadcast information that we dont mind if it doesnt arrive, and if it shows up late and out of sequence we can drop it without harm to the system or user experience.  `Ephemeral` messages are ideal for things like voice or user position updates, that shuould be fast and regular.
+Undertone is a remote server and client system for voice communication over the network. At the core of the network protocol are two categories of message types: `Ephemeral` and `Reliable`. These represent the data's need for guaranteed delivery and resistance to packet loss and corruption. A `Reliable` packet is used for things like control, chat, state updates for users on the server etc., when we want to be sure they arrive and if they don't they get resent. `Ephemeral` messages are designed to carry frequently broadcast information that we don't mind if it doesn't arrive, and if it shows up late and out of sequence we can drop it without harm to the system or user experience. Ephemeral` messages are ideal for things like voice or user position updates, that should be fast and regular.
 
-All messages will use a common header that provides some very basic data to hint to the server and client how it should interpret the packet and handle the stream.
+All messages will use a common header which provides some very basic data to hint to the server and client how it should interpret the packet and handle the stream.
 
 ### Headers
 
@@ -244,13 +244,20 @@ struct FixedHeader {
 }
 ```
 
+```rust
+struct Ping {
+    id: u32, // Unique ping id for response.
+    timestamp: util::TimeStamp, // u64 seconds and u32 nanoseconds converts to and from std::time::Duration.
+}
+```
+
 ### Audio
 
 ```rust
 bitflags! {
     struct AudioFlags : u8 {
-        const START     = 0b0000_0001; // Let client know this is the start of a transmission PTT Down
-        const END       = 0b0000_0010; // Let client know this is the end of a transmission PTT Up
+        const START     = 0b0000_0001; // Let client know this is the start of a transmission (PTT key Down)
+        const END       = 0b0000_0010; // Let client know this is the end of a transmission (PTT key Up)
         const RESERVED3 = 0b0000_0100;
         const RESERVED4 = 0b0000_1000;
         const RESERVED5 = 0b0001_0000;
@@ -273,7 +280,7 @@ struct VoiceChatAudio {
 ```rust
 struct WorldAudio {
     user_id: u16,       // Transmitting user network id.
-    volume: u8,         // Volume enum ("whisper", "Talk", "Shout" for RP and range purposes.)
+    volume: u8,         // Volume Enumerator ("whisper", "Talk", "Shout" for RP and range purposes.)
     audio_flags: u8,    // Audio chat flags
     audio: Bytes,       // raw audio codec bytes.
 }
@@ -282,11 +289,11 @@ struct WorldAudio {
 ```rust
 struct SubMixAudio {
     user_id: u16,       // Transmitting user network id.
-    channel_id: u16,    // submix id for subscription notification.
-    kind: u8,           // submix kind id.
+    channel_id: u16,    // SubMix id for subscription notification.
+    kind: u8,           // SubMix kind id.
     strength: u16,      // strength
     interference: u16,  // interference value
     audio: Bytes,       // raw audio codec bytes.
-    }
+}
 ```
 
