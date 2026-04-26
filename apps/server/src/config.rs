@@ -14,6 +14,20 @@ pub(crate) struct Settings {
     pub database: Database,
 }
 
+impl Settings {
+    /// Produce a valid uri for PostgreSQL
+    pub fn get_db_uri(&self) -> String {
+        format!(
+            "postgresql://{}:{}@{}:{}/{}",
+            self.database.username,
+            self.database.password,
+            self.database.address,
+            self.database.port,
+            self.database.database
+        )
+    }
+}
+
 #[derive(Debug, Deserialize)]
 #[allow(unused)]
 pub struct General {
@@ -89,5 +103,14 @@ mod test {
             settings.general.description,
             "A new Undertone community".to_string()
         );
+    }
+
+    #[test]
+    fn produce_valid_db_uri() {
+        let expected_uri =
+            "postgresql://defaultUser:defaultPassword@127.0.0.1:5432/defaultDatabase".to_string();
+        let settings = Settings::new().unwrap();
+
+        assert_eq!(settings.get_db_uri(), expected_uri);
     }
 }
