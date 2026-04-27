@@ -139,6 +139,32 @@ mod test {
     }
 
     #[test]
+    fn accepts_ini_config() {
+        let base = r#"
+        server_name=INI Test Server
+        server_description=A Test Server
+        admin_only=true
+        icon_path=a/path/to/the/icon.png
+        "#;
+
+        let private = r#"
+            db_kind=pgsql
+            db_addr=127.0.0.1
+            db_port=2345
+            db_user=YamlUser
+            db_pass=YamlPassword
+            db_name=YamlDatabase
+            "#;
+
+        assert_eq!(
+            Settings::new(base, private, FileFormat::Ini)
+                .unwrap()
+                .server_name,
+            "INI Test Server".to_string()
+        )
+    }
+
+    #[test]
     fn accepts_json_config() {
         let base = r#"
         {
