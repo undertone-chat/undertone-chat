@@ -1,6 +1,8 @@
+#![allow(dead_code)]
+
 use anyhow::{Context, Result, anyhow};
 use config::{Config, File, FileFormat, Source, Value};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 macro_rules! get_required_config {
     ($obj:expr, $name:literal) => {
         $obj.get_string($name)
@@ -29,7 +31,7 @@ macro_rules! define_settings {
             }
         ),* $(,)?
     ) => {
-        #[derive(Debug, Clone, Deserialize)]
+        #[derive(Debug, Clone, Deserialize, Serialize)]
         pub struct Settings {
             $(pub $field: $ty,)*
         }
@@ -208,7 +210,34 @@ define_settings! {
 
 #[cfg(test)]
 mod test {
+    use std::str::FromStr;
+
     use super::*;
+    use serde_json::{Map, Number, Value};
+
+    fn metadata_to_json() -> (Map<String, Value>, Map<String, Value>) {
+        let mut public = Map::new();
+        let mut private = Map::new();
+
+        for m in Settings::metadata() {
+            let v = match m.ty {
+                "string" => Value::String(m.default.to_string()),
+                "bool" => Value::Bool(m.default.parse().unwrap()),
+                "u32" => Value::Number(Number::from_str(m.default).unwrap()),
+                "i32" => Value::Number(Number::from_str(m.default).unwrap()),
+                "f32" => Value::Number(Number::from_str(m.default).unwrap()),
+                _ => panic!("unsupported test type {}", m.ty),
+            };
+
+            if m.private {
+                private.insert(m.key.to_string(), v);
+            } else {
+                public.insert(m.key.to_string(), v);
+            }
+        }
+
+        (public, private)
+    }
 
     // Helpers
     fn default_base() -> String {
@@ -234,6 +263,16 @@ mod test {
     }
     #[test]
     fn accepts_yaml_config() {
+        let mut base = String::new();
+        for meta in Settings::metadata() {
+            base.push
+        }
+        let yaml = serde_saphyr::Serializer::new(&mut base);
+        let settings = serde_saphyr::to_string(&Settings {
+            ..Default::default()
+        })
+        .unwrap();
+
         let base = r#"
         server_name: YAML Test Server
         server_description: A Test Server
