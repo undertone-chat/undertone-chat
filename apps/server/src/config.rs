@@ -151,9 +151,9 @@ mod test {
             db_kind=pgsql
             db_addr=127.0.0.1
             db_port=2345
-            db_user=YamlUser
-            db_pass=YamlPassword
-            db_name=YamlDatabase
+            db_user=IniUser
+            db_pass=IniPassword
+            db_name=IniDatabase
             "#;
 
         assert_eq!(
