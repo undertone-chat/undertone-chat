@@ -114,6 +114,35 @@ mod test {
     }
 
     #[test]
+    fn accepts_json_config() {
+        let base = r#"
+        {
+            "server_name": "JSON Test Server",
+            "server_description": "A Test Server",
+            "admin_only": true,
+            "icon_path": "a/path/to/the/icon.png"
+        }"#;
+
+        let private = r#"
+            {
+                "db_kind": "pgsql",
+                "db_addr": "127.0.0.1",
+                "db_port": "2345",
+                "db_user": "JsonUser",
+                "db_pass": "JsonPassword",
+                "db_name": "JsonDatabase"
+            }
+            "#;
+
+        assert_eq!(
+            Settings::new(base, private, FileFormat::Json)
+                .unwrap()
+                .server_name,
+            "JSON Test Server".to_string()
+        )
+    }
+
+    #[test]
     fn accepts_toml_config() {
         let base = default_base();
         let private = default_private();
