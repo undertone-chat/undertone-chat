@@ -1,12 +1,7 @@
 mod config;
 
+use anyhow::Result;
 use config::Settings;
-use std::str::from_utf8;
-
-use anyhow::{Result, anyhow};
-use tokio::io::AsyncReadExt;
-use tokio::net::{TcpListener, TcpStream};
-use tokio::runtime::Builder;
 
 fn main() -> Result<()> {
     // Setting up tracing subscriber.
@@ -22,25 +17,9 @@ fn main() -> Result<()> {
         std::env::consts::ARCH,
     );
 
-    let settings = Settings::new()?;
+    // let settings = Settings::new()?;
 
     // Print some basic config settings for log on start.
-    tracing::info!(
-        "
-        Undertone Configuration
-        -----------------------
-        Name: {}
-        Desc: {}
-        Server Port: {}
-        DB Addr: {}
-        DB Port: {}
-        Admin Only: {}",
-        settings.general.name,
-        settings.general.description,
-        settings.general.port,
-        settings.database.address,
-        settings.database.port,
-        settings.security.admin_only
-    );
+
     Ok(())
 }

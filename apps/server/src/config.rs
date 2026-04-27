@@ -1,93 +1,88 @@
 use std::env;
 
-use anyhow::{Result, anyhow};
-use config::{Config, Environment, File};
-use serde::Deserialize;
+use anyhow::{Context, Result, anyhow};
+use config::{Config, File, FileFormat};
+macro_rules! get_required_config {
+    ($obj:expr, $name:literal) => {
+        $obj.get_string($name)
+            .with_context(|| format!("failed to parse required '{}'", $name))
+    };
+}
 
-#[derive(Deserialize, Debug)]
+/// Stores server settings loaded from configuration files.
+#[doc(alias = "setting")]
 #[allow(unused)]
-pub(crate) struct Settings {
-    /// Stored in env as UNDERTONE_DEBUG=
-    //pub debug: bool,
-    pub general: General,
-    pub security: Security,
-    pub database: Database,
+#[derive(Debug)]
+pub struct Settings {
+    pub server_name: String,
+    pub server_description: String,
+    pub icon_path: Option<String>,
+    pub admin_only_access: bool,
+    pub db_kind: String,
+    pub db_user: String,
+    pub db_pass: String,
+    pub db_addr: String,
+    pub db_port: String,
+    pub db_name: String,
 }
 
 impl Settings {
-    /// Produce a valid uri for PostgreSQL
-    pub fn get_db_uri(&self) -> String {
-        format!(
-            "postgresql://{}:{}@{}:{}/{}",
-            self.database.username,
-            self.database.password,
-            self.database.address,
-            self.database.port,
-            self.database.database
-        )
-    }
-}
+    /// Parses strings from files into config object and validates and verifies configuration.
+    /// accepts strings in common configuration formats:
+    /// TOML, JSON, YAML, INI, RON, JSON5, CORN
+    ///
+    /// # Panics
+    ///
+    /// Panics if required settings are omitted from configurations.
+    /// Panics if format is incorrect in provided &str
+    pub fn new(base: &str, private: &str, format: FileFormat) -> Result<Self> {
+        let private_only: Vec<&str> = vec![
+            "db_user", "db_pass", "db_addr", "db_port", "db_name", "db_kind",
+        ];
 
-#[derive(Debug, Deserialize)]
-#[allow(unused)]
-pub struct General {
-    pub name: String,
-    pub description: String,
-    pub port: usize,
-}
-
-#[derive(Debug, Deserialize)]
-#[allow(unused)]
-pub struct Security {
-    pub admin_only: bool,
-}
-
-#[derive(Debug, Deserialize)]
-#[allow(unused)]
-pub struct Database {
-    pub address: String,
-    pub port: String,
-    pub database: String,
-    pub username: String,
-    pub password: String,
-}
-
-impl Settings {
-    pub fn new() -> Result<Self> {
         tracing::debug!("Getting run mode.");
+
         let run_mode = env::var("RUN_MODE").unwrap_or_else(|_| "development".into());
 
         tracing::debug!("Got run mode {}.  Loading files.", run_mode);
 
-        let s = Config::builder()
-            // Default Values for non Optional fields.
-            .set_default("general.name", "My Undertone Server")?
-            .set_default("general.description", "A new Undertone community")?
-            .set_default("general.port", "9990")?
-            .set_default("database.address", "127.0.0.1")?
-            .set_default("database.port", "5432")?
-            .set_default("database.username", "defaultUser")?
-            .set_default("database.database", "defaultDatabase")?
-            .set_default("database.password", "defaultPassword")?
-            .set_default("security.admin_only", false)?
-            // Load standard  undertone config.
-            .add_source(File::with_name("undertone").required(false))
-            // Search for any specific configurations for run mode (eg. development or production)
-            .add_source(File::with_name(&run_mode.to_string()).required(false))
-            // Load local file (Do not commit this to the repo, holds sensitive data)
-            .add_source(File::with_name("local").required(false))
-            // Load any and all environment variables prefixed with UNDERTONE
-            .add_source(Environment::with_prefix("UNDERTONE"))
+        let base_config = Config::builder()
+            .add_source(File::from_str(base, format))
             .build()?;
 
-        // Attempt to freeze into our Settings struct.
-        match s.try_deserialize::<Settings>() {
-            Ok(result) => Ok(result),
-            Err(error) => Err(anyhow!(
-                "Failed to deserialize settings to struct: {:?}",
-                error
-            )),
+        // Verify we do not have any private settings in our base config file.
+        for key in private_only {
+            if base_config.get_string(key).is_ok() {
+                return Err(anyhow!(
+                    "Private setting '{}' found in base config. This should only be set in the '.undertone_private' configuration.",
+                    key
+                ));
+            }
         }
+
+        let private_config = Config::builder()
+            .add_source(File::from_str(private, format))
+            .build()?;
+
+        // Build our settings struct with default values for missing values, err on required values.
+        let settings = Settings {
+            server_name: base_config
+                .get("server_name")
+                .unwrap_or("My Undertone Server".to_string()),
+            server_description: base_config
+                .get("server_description")
+                .unwrap_or("A new Undertone comunnity server".to_string()),
+            admin_only_access: base_config.get("admin_only_access").unwrap_or(false),
+            icon_path: base_config.get("icon_path").ok(),
+            db_kind: private_config.get("db_kind").unwrap_or("pgsql".to_string()),
+            db_addr: get_required_config!(private_config, "db_addr")?,
+            db_port: get_required_config!(private_config, "db_port")?,
+            db_user: get_required_config!(private_config, "db_user")?,
+            db_pass: get_required_config!(private_config, "db_pass")?,
+            db_name: get_required_config!(private_config, "db_name")?,
+        };
+
+        Ok(settings)
     }
 }
 
@@ -95,22 +90,74 @@ impl Settings {
 mod test {
     use super::*;
 
-    #[test]
-    fn loads_config_file() {
-        let settings = Settings::new().unwrap();
-        assert_eq!(settings.general.name, "My Undertone Server".to_string());
-        assert_eq!(
-            settings.general.description,
-            "A new Undertone community".to_string()
-        );
+    // Helpers
+    fn default_base() -> String {
+        r#"
+        server_name='Toml Test Server'
+        server_description='A Test Server'
+        admin_only=true
+        icon_path='a/path/to/the/icon.png'
+        "#
+        .to_string()
+    }
+
+    fn default_private() -> String {
+        r#"
+        db_kind='pgsql'
+        db_addr='127.0.0.2'
+        db_port='1234'
+        db_user='TestUser'
+        db_pass='TestPass'
+        db_name='TestDatabase'
+        "#
+        .to_string()
     }
 
     #[test]
-    fn produce_valid_db_uri() {
-        let expected_uri =
-            "postgresql://defaultUser:defaultPassword@127.0.0.1:5432/defaultDatabase".to_string();
-        let settings = Settings::new().unwrap();
+    fn accepts_toml_config() {
+        let base = default_base();
+        let private = default_private();
+        let kind = FileFormat::Toml;
 
-        assert_eq!(settings.get_db_uri(), expected_uri);
+        let settings = Settings::new(&base, &private, kind).unwrap();
+
+        assert_eq!(settings.server_name, "Toml Test Server".to_string());
     }
+
+    #[test]
+    fn rejects_private_settings_in_base() {
+        let base = r#"
+            server_name='Test Server'
+            server_description='A Test Server'
+            admin_only=true
+            icon_path='a/path/to/the/icon.png'
+            db_addr='127.0.0.2'
+            "#;
+
+        let private = default_private();
+        let result = Settings::new(base, &private, FileFormat::Toml).unwrap_err();
+        assert!(result.to_string().contains("Private setting"));
+    }
+
+    #[test]
+    fn rejects_missing_required_settings() {
+        let base = default_base();
+        let private = r#"
+            db_kind='pgsql'
+            db_port='1234'
+            db_user='TestUser'
+            db_pass='TestPass'
+            db_name='TestDatabase'
+            "#;
+
+        let result = Settings::new(&base, private, FileFormat::Toml).unwrap_err();
+        assert!(
+            result
+                .to_string()
+                .contains("failed to parse required 'db_addr'")
+        )
+    }
+
+    #[test]
+    fn fail_creation_if_missing_database_uri() {}
 }
