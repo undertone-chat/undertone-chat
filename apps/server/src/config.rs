@@ -112,6 +112,31 @@ mod test {
         "#
         .to_string()
     }
+    #[test]
+    fn accepts_yaml_config() {
+        let base = r#"
+        server_name: YAML Test Server
+        server_description: A Test Server
+        admin_only: true
+        icon_path: a/path/to/the/icon.png
+        "#;
+
+        let private = r#"
+                db_kind: pgsql
+                db_addr: 127.0.0.1
+                db_port: 2345
+                db_user: YamlUser
+                db_pass: YamlPassword
+                db_name: YamlDatabase
+            "#;
+
+        assert_eq!(
+            Settings::new(base, private, FileFormat::Yaml)
+                .unwrap()
+                .server_name,
+            "YAML Test Server".to_string()
+        )
+    }
 
     #[test]
     fn accepts_json_config() {
