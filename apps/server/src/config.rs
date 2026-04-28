@@ -82,14 +82,14 @@ impl Settings {
     /// # Errors
     /// If no paths are provided.
     /// If invalid config is detected.
-    pub fn from_paths(paths: Vec<&str>) -> Result<Self> {
+    pub fn from_paths(paths: Vec<String>) -> Result<Self> {
         if paths.is_empty() {
             return Err(anyhow!("No paths provided!"));
         }
 
         let mut builder = Config::builder();
         for path in paths {
-            builder = builder.add_source(File::with_name(path).required(true));
+            builder = builder.add_source(File::with_name(&path).required(true));
         }
 
         let settings: Settings = builder.build()?.try_deserialize()?;
@@ -157,6 +157,15 @@ impl Settings {
 mod test {
     use super::*;
 
+    fn to_yaml(val: &Settings) -> String {
+        serde_saphyr::to_string::<Settings>(val).expect("failed to serialize yaml")
+    }
+    fn to_ron(val: &Settings) -> String {
+        ron::to_string::<Settings>(val).expect("failed to serialize to ron")
+    }
+    fn to_json(val: &Settings) -> String {
+        serde_json::to_string_pretty::<Settings>(val).expect("failed to serialize json")
+    }
     fn to_toml(val: &Settings) -> String {
         toml::to_string_pretty::<Settings>(val).expect("failed to serialize to TOML")
     }
@@ -168,6 +177,42 @@ mod test {
         let toml = to_toml(&default_settings);
 
         let settings = Settings::from_string_literals(vec![toml], FileFormat::Toml).unwrap();
+
+        // Assert different variable types to ensure they are surviving the round trip.
+        assert_eq!(settings.server_name, "My Undertone Server".to_string());
+        assert_eq!(settings.server_port, 9990);
+        assert!(!settings.admin_only);
+    }
+
+    #[test]
+    fn parses_json() {
+        let default_settings = Settings::default();
+        let json = to_json(&default_settings);
+        let settings = Settings::from_string_literals(vec![json], FileFormat::Json).unwrap();
+
+        // Assert different variable types to ensure they are surviving the round trip.
+        assert_eq!(settings.server_name, "My Undertone Server".to_string());
+        assert_eq!(settings.server_port, 9990);
+        assert!(!settings.admin_only);
+    }
+
+    #[test]
+    fn parses_ron() {
+        let default_settings = Settings::default();
+        let ron = to_ron(&default_settings);
+        let settings = Settings::from_string_literals(vec![ron], FileFormat::Ron).unwrap();
+
+        // Assert different variable types to ensure they are surviving the round trip.
+        assert_eq!(settings.server_name, "My Undertone Server".to_string());
+        assert_eq!(settings.server_port, 9990);
+        assert!(!settings.admin_only);
+    }
+
+    #[test]
+    fn parses_yaml() {
+        let default_settings = Settings::default();
+        let yaml = to_yaml(&default_settings);
+        let settings = Settings::from_string_literals(vec![yaml], FileFormat::Yaml).unwrap();
 
         // Assert different variable types to ensure they are surviving the round trip.
         assert_eq!(settings.server_name, "My Undertone Server".to_string());
