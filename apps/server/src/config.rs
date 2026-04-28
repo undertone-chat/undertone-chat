@@ -1,9 +1,8 @@
 #![allow(dead_code)]
 
-use anyhow::{Context, Result, anyhow};
-use config::{Config, File, FileFormat, Source, Value};
+use anyhow::{Result, anyhow};
+use config::{Config, File, FileFormat};
 use serde::{Deserialize, Serialize};
-use thiserror::Error;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
