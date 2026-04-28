@@ -1,0 +1,13 @@
+server_name = "A Default Undertone Server"
+server_desc = "A Default Undertone Community"
+server_port = 9991
+server_icon = "undertone.png"
+admin_only = true
+
+[db]
+addr="localhost"
+port=5433
+user="default_user"
+pass="default_pass"
+name="default_database"
+kind="mysql"
