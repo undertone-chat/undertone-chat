@@ -12,7 +12,8 @@ server_desc = "A Default Undertone Community"
 server_port = 9991
 
 # Relative path to your servers icon (displayed to clients and on the web)
-server_icon = "undertone.png"
+# uncomment to use your own icon.
+# server_icon = "undertone.png"
 
 # Set to `true` to prevent anyone without admin privileges from connecting.
 # Useful for maintenance or development.
@@ -22,13 +23,18 @@ admin_only = true
 [db]
 # Address to connect to the db
 addr="localhost"
+
 # Port (ref your database docs or server host for the port)
 port=5433
+
 # Change to a unique user name that cannot be guessed.
 user="default_user"
+
 # Change to strong password that cannot be easily guessed.
 pass="default_pass"
+
 # Do not use the default database name, use something unique.
 name="default_database"
+
 # Options: pgsql (mysql, mongodb and other db solutions planned)
 kind="mysql"
