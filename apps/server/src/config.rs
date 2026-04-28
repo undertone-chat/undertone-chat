@@ -123,7 +123,7 @@ impl Settings {
 
         // Test the important settings.
         if settings.db.addr.is_empty() {
-            bad.push("db.addr is empty...");
+            bad.push("db_addr is empty...");
         }
         if settings.db.port < 1024 {
             bad.push("db_port is in restricted range, must be greater than 1023...");
@@ -147,7 +147,7 @@ impl Settings {
                 error_string.push(field.to_string());
             }
 
-            return Err(anyhow!(error_string.join("")));
+            return Err(anyhow!(error_string.join("\n")));
         }
         Ok(())
     }
