@@ -17,7 +17,7 @@ tokio-postgres = "0.7.17"
 ractor = "0.15.12"
 serde = { version = "1.0", features = ["derive"]}
 config = "0.15"
-
+thiserror.workspace = true
 
 [dev-dependencies]
 # Only used for testing.

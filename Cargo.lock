@@ -6360,6 +6360,7 @@ dependencies = [
  "serde-saphyr",
  "serde_json",
  "serde_json5",
+ "thiserror 2.0.18",
  "tokio",
  "tokio-postgres",
  "toml 1.1.2+spec-1.1.0",

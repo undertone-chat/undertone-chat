@@ -3,211 +3,143 @@
 use anyhow::{Context, Result, anyhow};
 use config::{Config, File, FileFormat, Source, Value};
 use serde::{Deserialize, Serialize};
-macro_rules! get_required_config {
-    ($obj:expr, $name:literal) => {
-        $obj.get_string($name)
-            .with_context(|| format!("failed to parse required '{}'", $name))
-    };
+use thiserror::Error;
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
+pub struct DatabaseSettings {
+    addr: String,
+    port: u32,
+    user: String,
+    pass: String,
+    name: String,
+    kind: String,
 }
 
-#[derive(Debug, Clone, Copy)]
-pub struct SettingMeta {
-    pub field: &'static str,
-    pub key: &'static str,
-    pub ty: &'static str,
-    pub default: &'static str,
-    pub private: bool,
-    pub required: bool,
-}
-
-macro_rules! define_settings {
-    (
-        $(
-            $field:ident : $ty:ty {
-                key: $key:literal,
-                default: $default:expr,
-                private: $private:expr,
-                required: $required:expr,
-            }
-        ),* $(,)?
-    ) => {
-        #[derive(Debug, Clone, Deserialize, Serialize)]
-        pub struct Settings {
-            $(pub $field: $ty,)*
-        }
-
-        impl Default for Settings {
-            fn default() -> Self {
-                Self {
-                    $($field: $default,)*
-                }
-            }
-        }
-
-        impl Settings {
-            pub fn metadata() -> &'static [SettingMeta] {
-                &[
-                    $(
-                        SettingMeta {
-                            field: stringify!($field),
-                            key: $key,
-                            ty: stringify!($ty),
-                            default: stringify!($default),
-                            private: $private,
-                            required: $required,
-                        }
-                    ),*
-                ]
-            }
-
-            pub fn parse_file_strings(base: &str, prv: &str, format: FileFormat) -> Result<Self> {
-                let mut builder = config::Config::builder();
-
-                $(builder = builder.set_default($key, $default)?;)*
-
-                let base_config = Config::builder()
-                    .add_source(File::from_str(base, format))
-                    .build()?;
-
-                for meta in Settings::metadata() {
-                    if meta.private {
-                        if let Ok(_) = base_config.get::<config::Value>(meta.key) {
-                            return Err(anyhow!(
-                                    "private settings `{}` was defined in your base config; move it to `.undertone_private`",
-                                    meta.key
-                                    ))
-                        }
-                    }
-                }
-
-                let config = builder
-                .add_source(base_config)
-                .add_source(File::from_str(prv, format))
-                .build()?;
-
-                let settings: Settings = config.try_deserialize()?;
-                settings.validate()?;
-
-                Ok(settings)
-            }
-
-            pub fn validate(&self) -> Result<()> {
-                $(
-                    if $required {
-                        validate_required(stringify!($field), &self.$field)?;
-                    }
-                    )*
-                    Ok(())
-            }
+impl Default for DatabaseSettings {
+    fn default() -> Self {
+        Self {
+            addr: "127.0.0.1".into(),
+            port: 5432,
+            user: "undertone_user".into(),
+            pass: "undertone_pass".into(),
+            name: "undertone_datbase".into(),
+            kind: "pgsql".into(),
         }
     }
 }
 
-trait RequiredCheck {
-    fn is_missing(&self) -> bool;
+#[serde(default)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Settings {
+    server_name: String,
+    server_desc: String,
+    server_port: u32,
+    server_icon: Option<String>,
+    db: DatabaseSettings,
 }
 
-impl RequiredCheck for String {
-    fn is_missing(&self) -> bool {
-        self.trim().is_empty()
+impl Default for Settings {
+    fn default() -> Self {
+        Self {
+            server_name: "My Undertone Server".into(),
+            server_desc: "A **NEW** Undertone Community Server".into(),
+            server_port: 9990,
+            server_icon: None,
+            db: DatabaseSettings {
+                ..Default::default()
+            },
+        }
     }
 }
 
-impl RequiredCheck for bool {
-    fn is_missing(&self) -> bool {
-        false
+impl Settings {
+    /// Instantiate a new Settings loaded from the following files:
+    /// undertone.<extension>
+    /// local.<extension>
+    /// dev.<extension>
+    ///
+    /// Settings are layered in the above order so dev will overwrite local and local will
+    /// overwrite undertone. This allows for testing and special dev settings based on
+    /// environment.
+    pub fn new() -> Result<Self> {
+        let settings: Settings = Config::builder()
+            .add_source(File::from_name("undertone").required(true))
+            .add_source(File::from_name("local").required(false))
+            .add_source(File::from_name("dev").required(false))
+            .build()?
+            .try_deserialize()?;
+
+            Ok(settings)
+    }
+
+    /// Loads config from custom paths. The path should not include the file extension
+    /// as format is auto detected. Paths should not use extensions as they will be
+    /// automatically detected eg. `config/undertone` will load undertone.toml, undertone.json etc.
+    ///
+    /// # Errors
+    /// If no paths are provided.
+    /// If invalid config is detected.
+    pub fn from_paths(paths: Vec<&str>) -> Result<Self> {
+        if paths.is_empty() {
+            return Err(anyhow!("No paths provided!"));
+        }
+
+        let mut builder = Config::builder();
+        for path in paths {
+            builder = builder.add_source(File::with_name(path).required(true));
+        }
+
+        let settings: Settings = builder.build()?.try_deserialize()?;
+        Ok(settings)
+    }
+
+    /// Loads config using string literal representations of the config file. You must specify
+    /// the format for the strings using config::FileFormat.
+    ///
+    /// # Errors
+    /// If no strings are provided.
+    /// If invalid strings are provided.
+    fn from_string_literals(configs: Vec<&str>, format: FileFormat) -> Result<Self> {
+        if configs.is_empty() {
+            return Err(anyhow!("No config strings received!"));
+        }
+
+        let mut builder = Config::builder();
+        for config in configs {
+            builder = builder.add_source(File::from_str(config, format));
+        }
+
+        let settings: Settings = builder.build()?.try_deserialize()?;
+        Ok(settings)
     }
 }
 
-impl RequiredCheck for u32 {
-    fn is_missing(&self) -> bool {
-        false
-    }
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Settings {
+    server_name: String,
+    server_desc: String,
+    server_port: u32,
+    server_icon: Option<String>,
+    #[serde(default)]
+    db: DatabaseSettings,
 }
 
-impl RequiredCheck for i32 {
-    fn is_missing(&self) -> bool {
-        false
+impl Default for Settings {
+    fn default() -> Self {
+        Self {
+            server_name: "My Undertone Server".into(),
+            server_desc: "A **NEW** Undertone Community Server".into(),
+            server_port: 9990,
+            server_icon: None,
+            db: DatabaseSettings {
+                ..Default::default()
+            },
+        }
     }
 }
-
-impl RequiredCheck for f32 {
-    fn is_missing(&self) -> bool {
-        false
     }
 }
-
-fn validate_required<T: RequiredCheck>(field: &'static str, value: &T) -> Result<()> {
-    if value.is_missing() {
-        Err(anyhow!("required setting `{}` is missing", field))
-    } else {
-        Ok(())
-    }
-}
-
-define_settings! {
-    server_name: String {
-        key: "server_name",
-        default: "My Undertone Server".to_string(),
-        private: false,
-        required: true,
-    },
-    server_description: String {
-        key: "server_desc",
-        default: "A new Undertone community server.".to_string(),
-        private: false,
-        required: true,
-    },
-    icon_path: String {
-        key: "icon_path",
-        default: "".to_string(),
-        private: false,
-        required: false,
-    },
-    admin_only: bool {
-        key: "admin_only",
-        default: false,
-        private: false,
-        required: true,
-    },
-    db_kind: String {
-        key: "db_kind",
-        default: "pgsql".to_string(),
-        private: true,
-        required: true,
-    },
-    db_addr: String {
-        key: "db_addr",
-        default: "".to_string(),
-        private: true,
-        required: true,
-    },
-    db_port: u32 {
-        key: "db_port",
-        default: 5432,
-        private: true,
-        required: true,
-    },
-    db_user: String {
-        key: "db_user",
-        default: "".to_string(),
-        private: true,
-        required: true,
-    },
-    db_pass: String {
-        key: "db_pass",
-        default: "".to_string(),
-        private: true,
-        required: true,
-    },
-    db_name: String {
-        key: "db_name",
-        default: "".to_string(),
-        private: true,
-        required: true,
-    }
-}
-
 #[cfg(test)]
 mod test {
     use std::str::FromStr;
@@ -221,7 +153,7 @@ mod test {
 
         for m in Settings::metadata() {
             let v = match m.ty {
-                "string" => Value::String(m.default.to_string()),
+                "String" => Value::String(m.default.to_string()),
                 "bool" => Value::Bool(m.default.parse().unwrap()),
                 "u32" => Value::Number(Number::from_str(m.default).unwrap()),
                 "i32" => Value::Number(Number::from_str(m.default).unwrap()),
@@ -237,6 +169,34 @@ mod test {
         }
 
         (public, private)
+    }
+
+    fn json_fixtures() -> (String, String) {
+        let (public, private) = metadata_to_json();
+
+        (
+            serde_json::to_string_pretty(&public).unwrap(),
+            serde_json::to_string_pretty(&private).unwrap(),
+        )
+    }
+
+    fn yaml_fixtures() -> (String, String) {
+        let (public, private) = metadata_to_json();
+        (
+            serde_saphyr::to_string(&public).unwrap(),
+            serde_saphyr::to_string(&private).unwrap(),
+        )
+    }
+
+    fn toml_fixtures() -> (String, String) {
+        let (public, private) = metadata_to_json();
+
+        let toml_public = toml::Value::try_from(public).unwrap();
+        let toml_private = toml::Value::try_from(private).unwrap();
+        (
+            toml::to_string_pretty(&toml_public).unwrap(),
+            toml::to_string_pretty(&toml_private).unwrap(),
+        )
     }
 
     // Helpers
@@ -262,39 +222,13 @@ mod test {
         .to_string()
     }
     #[test]
-    fn accepts_yaml_config() {
-        let mut base = String::new();
-        for meta in Settings::metadata() {
-            base.push
-        }
-        let yaml = serde_saphyr::Serializer::new(&mut base);
-        let settings = serde_saphyr::to_string(&Settings {
-            ..Default::default()
-        })
-        .unwrap();
+    fn loads_yaml() {
+        let (public, private) = yaml_fixtures();
+        let settings = Settings::parse_file_strings(&public, &private, FileFormat::Yaml).unwrap();
 
-        let base = r#"
-        server_name: YAML Test Server
-        server_description: A Test Server
-        admin_only: true
-        icon_path: a/path/to/the/icon.png
-        "#;
-
-        let private = r#"
-                db_kind: pgsql
-                db_addr: 127.0.0.1
-                db_port: 2345
-                db_user: YamlUser
-                db_pass: YamlPassword
-                db_name: YamlDatabase
-            "#;
-
-        assert_eq!(
-            Settings::parse_file_strings(base, private, FileFormat::Yaml)
-                .unwrap()
-                .server_name,
-            "YAML Test Server".to_string()
-        )
+        assert_eq!(settings.server_name, "My Undertone Server");
+        assert!(!settings.admin_only);
+        assert_eq!(settings.db_port, 5432);
     }
 
     #[test]
