@@ -29,6 +29,7 @@ impl Default for DatabaseSettings {
     }
 }
 
+/// Represents the server settings as parsed from configuration files.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Settings {
@@ -102,14 +103,14 @@ impl Settings {
     /// # Errors
     /// If no strings are provided.
     /// If invalid strings are provided.
-    fn from_string_literals(configs: Vec<&str>, format: FileFormat) -> Result<Self> {
+    fn from_string_literals(configs: Vec<String>, format: FileFormat) -> Result<Self> {
         if configs.is_empty() {
             return Err(anyhow!("No config strings received!"));
         }
 
         let mut builder = Config::builder();
         for config in configs {
-            builder = builder.add_source(File::from_str(config, format));
+            builder = builder.add_source(File::from_str(&config, format));
         }
 
         let settings: Settings = builder.build()?.try_deserialize()?;
@@ -117,6 +118,7 @@ impl Settings {
         Ok(settings)
     }
 
+    /// Validate settings based on individual requirements. Not all settings are validated.
     fn validate_settings(settings: &Self) -> Result<()> {
         let mut bad: Vec<&str> = vec![];
 
@@ -166,9 +168,7 @@ mod test {
 
         let toml = to_toml(&default_settings);
 
-        let strings: Vec<&str> = vec![toml.as_str()];
-
-        let settings = Settings::from_string_literals(strings, FileFormat::Toml).unwrap();
+        let settings = Settings::from_string_literals(vec![toml], FileFormat::Toml).unwrap();
 
         // Assert different variable types to ensure they are surviving the round trip.
         assert_eq!(settings.server_name, "My Undertone Server".to_string());
@@ -183,10 +183,8 @@ mod test {
 
         let toml = to_toml(&default_settings);
 
-        let strings: Vec<&str> = vec![toml.as_str()];
-
         assert!(
-            Settings::from_string_literals(strings, FileFormat::Toml)
+            Settings::from_string_literals(vec![toml], FileFormat::Toml)
                 .unwrap_err()
                 .to_string()
                 .contains("is empty")
@@ -199,9 +197,9 @@ mod test {
         default_settings.db.port = 69;
 
         let toml = to_toml(&default_settings);
-        let strings: Vec<&str> = vec![toml.as_str()];
+
         assert!(
-            Settings::from_string_literals(strings, FileFormat::Toml)
+            Settings::from_string_literals(vec![toml], FileFormat::Toml)
                 .unwrap_err()
                 .to_string()
                 .contains("restricted")
@@ -214,9 +212,9 @@ mod test {
         default_settings.db.port = 70000;
 
         let toml = to_toml(&default_settings);
-        let strings: Vec<&str> = vec![toml.as_str()];
+
         assert!(
-            Settings::from_string_literals(strings, FileFormat::Toml)
+            Settings::from_string_literals(vec![toml], FileFormat::Toml)
                 .unwrap_err()
                 .to_string()
                 .contains("maximum possible port")
