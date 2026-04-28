@@ -66,9 +66,9 @@ impl Settings {
     /// environment.
     pub fn new() -> Result<Self> {
         let settings: Settings = Config::builder()
-            .add_source(File::with_name("undertone").required(true))
-            .add_source(File::with_name("local").required(false))
-            .add_source(File::with_name("dev").required(false))
+            .add_source(File::with_name("config/undertone").required(true))
+            .add_source(File::with_name("config/local").required(false))
+            .add_source(File::with_name("config/dev").required(false))
             .build()?
             .try_deserialize()?;
 
