@@ -272,5 +272,6 @@ mod test {
         assert_eq!(settings.server_name, "A Default Undertone Server");
         assert_eq!(settings.server_port, 9991);
         assert!(settings.admin_only);
+        assert_eq!(settings.db.kind, "mysql");
     }
 }
