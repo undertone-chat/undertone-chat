@@ -264,4 +264,13 @@ mod test {
                 .contains("maximum possible port")
         )
     }
+
+    #[test]
+    fn load_from_files() {
+        let settings = Settings::new().expect("failed to creating settings from files.");
+
+        assert_eq!(settings.server_name, "A Default Undertone Server");
+        assert_eq!(settings.server_port, 9991);
+        assert!(settings.admin_only);
+    }
 }
