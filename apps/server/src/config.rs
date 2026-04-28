@@ -22,7 +22,7 @@ impl Default for DatabaseSettings {
             port: 5432,
             user: "undertone_user".into(),
             pass: "undertone_pass".into(),
-            name: "undertone_datbase".into(),
+            name: "undertone_database".into(),
             kind: "pgsql".into(),
         }
     }
