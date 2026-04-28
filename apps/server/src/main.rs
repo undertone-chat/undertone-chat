@@ -18,9 +18,20 @@ fn main() -> Result<()> {
     );
 
     // TODO: Add support for command line pointers to user specified config files.
-    let settings = Settings::new()?;
+    let (settings, used_default_settings) = match Settings::new() {
+        Ok(settings) => (settings, false),
+        Err(error) => {
+            tracing::warn!(error = %error, "Failed to load configuration; starting with default settings");
+            (Settings::default(), true)
+        }
+    };
 
     // Print some basic config settings for log on start.
-    tracing::info!("Config loaded for {}", settings.server_name);
+    if used_default_settings {
+        tracing::info!("Default config loaded for: {}", settings.server_name);
+    } else {
+        tracing::info!("Config loaded for {}", settings.server_name);
+    }
+
     Ok(())
 }
