@@ -17,9 +17,10 @@ fn main() -> Result<()> {
         std::env::consts::ARCH,
     );
 
-    // let settings = Settings::new()?;
+    // TODO: Add support for command line pointers to user specified config files.
+    let settings = Settings::new()?;
 
     // Print some basic config settings for log on start.
-
+    tracing::info!("Config loaded for {}", settings.server_name);
     Ok(())
 }

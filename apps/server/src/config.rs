@@ -7,12 +7,12 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct DatabaseSettings {
-    addr: String,
-    port: u32,
-    user: String,
-    pass: String,
-    name: String,
-    kind: String,
+    pub addr: String,
+    pub port: u32,
+    pub user: String,
+    pub pass: String,
+    pub name: String,
+    pub kind: String,
 }
 
 impl Default for DatabaseSettings {
@@ -32,12 +32,12 @@ impl Default for DatabaseSettings {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Settings {
-    server_name: String,
-    server_desc: String,
-    server_port: u32,
-    server_icon: Option<String>,
-    admin_only: bool,
-    db: DatabaseSettings,
+    pub server_name: String,
+    pub server_desc: String,
+    pub server_port: u32,
+    pub server_icon: Option<String>,
+    pub admin_only: bool,
+    pub db: DatabaseSettings,
 }
 
 impl Default for Settings {
