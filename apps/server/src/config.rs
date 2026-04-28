@@ -29,13 +29,14 @@ impl Default for DatabaseSettings {
     }
 }
 
-#[serde(default)]
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(default)]
 pub struct Settings {
     server_name: String,
     server_desc: String,
     server_port: u32,
     server_icon: Option<String>,
+    admin_only: bool,
     db: DatabaseSettings,
 }
 
@@ -46,6 +47,7 @@ impl Default for Settings {
             server_desc: "A **NEW** Undertone Community Server".into(),
             server_port: 9990,
             server_icon: None,
+            admin_only: false,
             db: DatabaseSettings {
                 ..Default::default()
             },
@@ -64,13 +66,13 @@ impl Settings {
     /// environment.
     pub fn new() -> Result<Self> {
         let settings: Settings = Config::builder()
-            .add_source(File::from_name("undertone").required(true))
-            .add_source(File::from_name("local").required(false))
-            .add_source(File::from_name("dev").required(false))
+            .add_source(File::with_name("undertone").required(true))
+            .add_source(File::with_name("local").required(false))
+            .add_source(File::with_name("dev").required(false))
             .build()?
             .try_deserialize()?;
 
-            Ok(settings)
+        Ok(settings)
     }
 
     /// Loads config from custom paths. The path should not include the file extension
@@ -111,235 +113,113 @@ impl Settings {
         }
 
         let settings: Settings = builder.build()?.try_deserialize()?;
+        Self::validate_settings(&settings)?;
         Ok(settings)
     }
-}
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Settings {
-    server_name: String,
-    server_desc: String,
-    server_port: u32,
-    server_icon: Option<String>,
-    #[serde(default)]
-    db: DatabaseSettings,
-}
+    fn validate_settings(settings: &Self) -> Result<()> {
+        let mut bad: Vec<&str> = vec![];
 
-impl Default for Settings {
-    fn default() -> Self {
-        Self {
-            server_name: "My Undertone Server".into(),
-            server_desc: "A **NEW** Undertone Community Server".into(),
-            server_port: 9990,
-            server_icon: None,
-            db: DatabaseSettings {
-                ..Default::default()
-            },
+        // Test the important settings.
+        if settings.db.addr.is_empty() {
+            bad.push("db.addr is empty...");
         }
+        if settings.db.port < 1024 {
+            bad.push("db_port is in restricted range, must be greater than 1023...");
+        }
+        if settings.db.port >= u16::MAX.into() {
+            bad.push("db_port is higher than maximum possible port, must be less than 65,535");
+        }
+        if settings.db.user.is_empty() {
+            bad.push("db_user is empty...");
+        }
+        if settings.db.pass.is_empty() {
+            bad.push("db_pass is empty...");
+        }
+        if settings.db.name.is_empty() {
+            bad.push("db_name is empty...");
+        }
+
+        if !bad.is_empty() {
+            let mut error_string: Vec<String> = vec![];
+            for field in bad {
+                error_string.push(field.to_string());
+            }
+
+            return Err(anyhow!(error_string.join("")));
+        }
+        Ok(())
     }
 }
-    }
-}
+
 #[cfg(test)]
 mod test {
-    use std::str::FromStr;
-
     use super::*;
-    use serde_json::{Map, Number, Value};
 
-    fn metadata_to_json() -> (Map<String, Value>, Map<String, Value>) {
-        let mut public = Map::new();
-        let mut private = Map::new();
-
-        for m in Settings::metadata() {
-            let v = match m.ty {
-                "String" => Value::String(m.default.to_string()),
-                "bool" => Value::Bool(m.default.parse().unwrap()),
-                "u32" => Value::Number(Number::from_str(m.default).unwrap()),
-                "i32" => Value::Number(Number::from_str(m.default).unwrap()),
-                "f32" => Value::Number(Number::from_str(m.default).unwrap()),
-                _ => panic!("unsupported test type {}", m.ty),
-            };
-
-            if m.private {
-                private.insert(m.key.to_string(), v);
-            } else {
-                public.insert(m.key.to_string(), v);
-            }
-        }
-
-        (public, private)
+    fn to_toml(val: &Settings) -> String {
+        toml::to_string_pretty::<Settings>(val).expect("failed to serialize to TOML")
     }
 
-    fn json_fixtures() -> (String, String) {
-        let (public, private) = metadata_to_json();
-
-        (
-            serde_json::to_string_pretty(&public).unwrap(),
-            serde_json::to_string_pretty(&private).unwrap(),
-        )
-    }
-
-    fn yaml_fixtures() -> (String, String) {
-        let (public, private) = metadata_to_json();
-        (
-            serde_saphyr::to_string(&public).unwrap(),
-            serde_saphyr::to_string(&private).unwrap(),
-        )
-    }
-
-    fn toml_fixtures() -> (String, String) {
-        let (public, private) = metadata_to_json();
-
-        let toml_public = toml::Value::try_from(public).unwrap();
-        let toml_private = toml::Value::try_from(private).unwrap();
-        (
-            toml::to_string_pretty(&toml_public).unwrap(),
-            toml::to_string_pretty(&toml_private).unwrap(),
-        )
-    }
-
-    // Helpers
-    fn default_base() -> String {
-        r#"
-        server_name='Toml Test Server'
-        server_description='A Test Server'
-        admin_only=true
-        icon_path='a/path/to/the/icon.png'
-        "#
-        .to_string()
-    }
-
-    fn default_private() -> String {
-        r#"
-        db_kind='pgsql'
-        db_addr='127.0.0.2'
-        db_port='1234'
-        db_user='TestUser'
-        db_pass='TestPass'
-        db_name='TestDatabase'
-        "#
-        .to_string()
-    }
     #[test]
-    fn loads_yaml() {
-        let (public, private) = yaml_fixtures();
-        let settings = Settings::parse_file_strings(&public, &private, FileFormat::Yaml).unwrap();
+    fn loads_config_from_strings() {
+        let default_settings = Settings::default();
 
-        assert_eq!(settings.server_name, "My Undertone Server");
+        let toml = to_toml(&default_settings);
+
+        let strings: Vec<&str> = vec![toml.as_str()];
+
+        let settings = Settings::from_string_literals(strings, FileFormat::Toml).unwrap();
+
+        // Assert different variable types to ensure they are surviving the round trip.
+        assert_eq!(settings.server_name, "My Undertone Server".to_string());
+        assert_eq!(settings.server_port, 9990);
         assert!(!settings.admin_only);
-        assert_eq!(settings.db_port, 5432);
     }
 
     #[test]
-    fn accepts_ini_config() {
-        let base = r#"
-        server_name=INI Test Server
-        server_description=A Test Server
-        admin_only=true
-        icon_path=a/path/to/the/icon.png
-        "#;
+    fn fails_on_empty_settings() {
+        let mut default_settings = Settings::default();
+        default_settings.db.addr = "".into();
 
-        let private = r#"
-            db_kind=pgsql
-            db_addr=127.0.0.1
-            db_port=2345
-            db_user=IniUser
-            db_pass=IniPassword
-            db_name=IniDatabase
-            "#;
+        let toml = to_toml(&default_settings);
 
-        assert_eq!(
-            Settings::parse_file_strings(base, private, FileFormat::Ini)
-                .unwrap()
-                .server_name,
-            "INI Test Server".to_string()
+        let strings: Vec<&str> = vec![toml.as_str()];
+
+        assert!(
+            Settings::from_string_literals(strings, FileFormat::Toml)
+                .unwrap_err()
+                .to_string()
+                .contains("is empty")
         )
     }
 
     #[test]
-    fn accepts_json_config() {
-        let base = r#"
-        {
-            "server_name": "JSON Test Server",
-            "server_description": "A Test Server",
-            "admin_only": true,
-            "icon_path": "a/path/to/the/icon.png"
-        }"#;
+    fn fails_on_reserved_port() {
+        let mut default_settings = Settings::default();
+        default_settings.db.port = 69;
 
-        let private = r#"
-            {
-                "db_kind": "pgsql",
-                "db_addr": "127.0.0.1",
-                "db_port": "2345",
-                "db_user": "JsonUser",
-                "db_pass": "JsonPassword",
-                "db_name": "JsonDatabase"
-            }
-            "#;
-
-        assert_eq!(
-            Settings::parse_file_strings(base, private, FileFormat::Json)
-                .unwrap()
-                .server_name,
-            "JSON Test Server".to_string()
+        let toml = to_toml(&default_settings);
+        let strings: Vec<&str> = vec![toml.as_str()];
+        assert!(
+            Settings::from_string_literals(strings, FileFormat::Toml)
+                .unwrap_err()
+                .to_string()
+                .contains("restricted")
         )
     }
 
     #[test]
-    fn accepts_toml_config() {
-        let base = default_base();
-        let private = default_private();
-        let kind = FileFormat::Toml;
+    fn fails_on_out_of_range_port() {
+        let mut default_settings = Settings::default();
+        default_settings.db.port = 70000;
 
-        let settings = Settings::parse_file_strings(&base, &private, kind).unwrap();
-
-        assert_eq!(settings.server_name, "Toml Test Server".to_string());
+        let toml = to_toml(&default_settings);
+        let strings: Vec<&str> = vec![toml.as_str()];
+        assert!(
+            Settings::from_string_literals(strings, FileFormat::Toml)
+                .unwrap_err()
+                .to_string()
+                .contains("maximum possible port")
+        )
     }
-
-    #[test]
-    fn rejects_private_settings_in_base() {
-        let base = r#"
-            server_name='Test Server'
-            server_description='A Test Server'
-            admin_only=true
-            icon_path='a/path/to/the/icon.png'
-            db_addr='127.0.0.2'
-            "#;
-
-        let private = default_private();
-        let result = Settings::parse_file_strings(base, &private, FileFormat::Toml).unwrap_err();
-        assert!(result.to_string().contains("private settings"));
-    }
-
-    #[test]
-    fn rejects_missing_required_settings() {
-        let base = default_base();
-        let private = r#"
-            db_kind='pgsql'
-            db_port='1234'
-            db_user='TestUser'
-            db_pass='TestPass'
-            db_name='TestDatabase'
-            "#;
-
-        let result = Settings::parse_file_strings(&base, private, FileFormat::Toml).unwrap_err();
-        let error_string = result.to_string();
-        assert!(error_string.contains("Missing") || error_string.contains("missing"));
-
-        let private = r#"
-            db_addr=''
-            db_kind='pgsql'
-            db_port=1234
-            db_user='TestUser'
-            db_pass='TestPass'
-            db_name='TestDatabase'
-            "#;
-        let result = Settings::parse_file_strings(&base, private, FileFormat::Toml).unwrap_err();
-        let error_string = result.to_string();
-        assert!(error_string.contains("Missing") || error_string.contains("missing"));
-    }
-
-    #[test]
-    fn fail_creation_if_missing_database_uri() {}
 }
