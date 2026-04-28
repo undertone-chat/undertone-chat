@@ -5288,17 +5288,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "serde_json5"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5d34d03f54462862f2a42918391c9526337f53171eaa4d8894562be7f252edd3"
-dependencies = [
- "pest",
- "pest_derive",
- "serde",
-]
-
-[[package]]
 name = "serde_path_to_error"
 version = "0.1.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6359,7 +6348,6 @@ dependencies = [
  "serde",
  "serde-saphyr",
  "serde_json",
- "serde_json5",
  "thiserror 2.0.18",
  "tokio",
  "tokio-postgres",
