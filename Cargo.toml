@@ -9,9 +9,9 @@ readme = "README.md"
 license-file = "LICENSE.md"
 edition = "2024"
 homepage = "https://github.com/undertone-chat/undertone-chat"
-license = "ULv1"
 publish = false
 repository = "https://github.com/undertone-chat/undertone-chat"
+keywords = ["voice","gaming","chat","social","community"]
 
 [workspace.dependencies]
 log = "0.4.29"
