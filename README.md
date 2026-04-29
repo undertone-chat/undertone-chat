@@ -1,110 +1,76 @@
+<div align="center"><img src="docs/images/icon_1024x1024.png" width="30%"></div>
+
+![GitHub commit activity (branch)](https://img.shields.io/github/commit-activity/m/undertone-chat/undertone-chat/main)
+![GitHub Tag](https://img.shields.io/github/v/tag/undertone-chat/undertone-chat)
+
 # Undertone
+Voice comms and community tools for serious gaming and roleplay. Undertone is designed to fill a niche in the gaming world where communities find them selves spread across many different solutions for voice, chat, scheduling and specialized tools used by roleplay and sim communities.
 
-In the world of online roleplay there are few free and flexible options for realtime communication, a critical part of the roleplay experience. Most solutions are either expensive to license or are very specific to one particular genre or game. Undertone solves these issues by providing an open source and free to use real time voice communication solution which is:
-1. Easily extensible through scripting to work with any game or genre.
-2. Provides out of the box solutions for the most common roleplay games and requirements.
-3. Built on rust to be fast and platform agnostic.
-4. Scallable server and client that can work on even bad connections and slow computers to remain inclusive of all communities.
+# Key Features
+These are some of the key features that are planned for implementation, the list is not exhaustive and may not reflect the most current development plans.
 
-## Values
-It is difficult in this day and age to make promisses or commitments when technology and soci-econmic factors change so rapidly.  While I would love to make a guarentee or promise about a policy and stand by it for ever, it would be naive to do so knowing how important context when evaluating decisions about a product.  To that end I do want to set forth some values which can be used to guide the development and future decisions of Undertone.
+## Voice Communication
 
-### Privacy First
+The core of the software is supporting voice comms for everything from casual chat to specialize solutions for MIL-SIM and roleplay in games in FiveM, RedM, Flight Sims, ARMA and more.
 
-Your right to privacy will always be a top priority for the developers and every reasonable effort will be made to ensure your personal information is never leaked or exposed.
+- [ ] Channel based voice chat for community and casual gaming similar to Discord or TeamSpeak.
+- [ ] World mode: positional 3D
+- [ ] SubMix mode: Customizable voice channels used to simulate radios, cell phones and even supernatural telepathy, you control the effects and rules of how it is rendered.
 
-### Ethical Finances
+## Text Communication
 
-Communities are the foundation of successful projects, and the community that Undertone is intended to serve often has to do a lot with very little, so you will never be charged to use the `Undertone Client` or `Undertone CLI Server` regardless of user counts so long as your community is not charging for access or play. For users or communities that charge for their services, they may license Undertone for reasonable flat fees.
+No community solution is complete without the ability to chat, make posts, and create announcements to keep your players in sync and engaged. All text chat is planned to support almost all the Markdown options and extensions like LaTeX and Mermaid.
 
-Finally **ANY** community that publically supports hate, discrimination or harm against any persons may have their access revoked.
+- [ ] Text channels for persistent scrolling chat and live conversations.
+- [ ] Forum channels for posting threads and organizing communications more effectively with stronger persistence for things like support and recruiting.
+- [ ] Feed channels where you can use sources like a Text channel, RSS feed or WebSocket and format them based on your own creative choices for display to the community.
+- [ ] Events with server calendars, sign ups and reminder's.
 
-### Open Access
+## Control and Privacy
 
-Undertone uses a copy left AGPL 3.0 [LICENSE](LICENSE) to ensure the product can remain free and any variations or forks of the project will carry that license forward. The intent is that what ever has been learned and created during the development of this product was done on the backs of giants using software and knowledge that has been freely shared and distributed without bias.  Therefor the product of those things should also remain freely available to use and learn from.
+One of the primary goals of Undertone was to provide communities with a tool that handles most of their needs and prevent fracturing across multiple apps and platforms. A big advantage of that is controlling where and how your information is stored as well having full control over your hosting and integrations.
 
-### Do No Harm
+- [ ] End-to-end-encryption for all network traffic.
+- [ ] Private data always stored with encryption in the database so you don't have to worry.
+- [ ] Fully encrypted private chats with rotating keys so only those present when a message was written can decrypt it. No worries about snooping admins or data breaches for your personal chats.
+- [ ] You choose your hosting platform whether that is at home or on the cloud, or next to your roleplay server for tight integration.
 
-At the time of writing this, the idea of Do No Harm as a developer and company was front and center in the zeitgeist. It is a fundamental beleif that as the creators of ideas and products it is on us to make choices in how our products and resources may be used to help prevent harm to others, regardless of if they use the products or not. In the case of community based software this is especially important as the free and privacy first nature of Undertone may be very appealing to those who actively harm others. To combat those individuals several tools will be put into place to control the ability to use the software for harmm without exposing normal users data or privacy.
+## Real-Time Game Data and Extensibility
 
-## Features of Undertone
+In order to serve different games, different communities and all the needs that fall in between the extremes, Undertone supports several pathways for integration and capturing the data you need.
 
-This is a non-exhaustive list of features that we hope will be present by the 1.0 release of Undertone. We will not  be attaching dates or version targets for the features to ensure development can proceed in a way that is healthy and
- organic without artificial deadlines.
+- [ ] API for receiving data from the client via mods.
+- [ ] Lua scripting to poll data from game API or server API.
+- [ ] Highly configurable systems for parsing and tweaking data on the server to drive effects like radio distortion or reverb.
 
-- [ ] **End to End Encryption** (E2E): Everything from your voice to login data and chat will be encrypted E2E, even *we* won't know what you are saying!
-- [ ] **User Authorization** - Provide optional authorization tools to control user access and privledge
-    - [ ] **Email** & Password - A very simple auth system to allow for basic login and account control using a users email and password as authentication tokens.
-    - [ ] **OAuth** - Allow users to register on your server using OAuth providers like other voice softwares that shall remain nameless.
-    - [ ] **2FA** - Enable two factor authentication for extra security and to help users protect their accounts.
-- [ ] **Hierarchal Role Based Access Control** (RBAC) for users.
-- [ ] **Voice Chat**: This is the core of the project and its main intended use.
-    - [ ] **Channels** - Server Admins may create channels for users to chat in using voice or text messaging.
-    - [ ] **Submix** - Communication with users outside of channels using subscription based packet routing and policies. These will be the backbone of things like radios, whispers or even supenatural communications.
-    - [ ] **Positional** - Allow mixing sources in channels and sub mixes so they appear to emit from 3D space around the listener by attaching coordinates to the voice packet.
-    - [ ] **Effects** - Allow data driven effect chains to change EQ, reverb and other audio effects on a per source basis.
-    - [ ] **Server Codec Tuning** Servers may set required or maximum codec hints to control bandwidth and latency for users.
-    - [ ] **Client Codec Tuning** - Clients will adjust their  encoding based on connection metrics to avoid quality issues.
-    - [ ] **Opus Codec** - Tried and true foundation.
-- [ ] **Cross Plaform Desktop Client** - Built on Dioxus, rust and modern CSS.
-- [ ] **Cross Plaform CLI Server** - Built on rust cause its damn cool.
-- [ ] **Server Manager** - Web based server management tool.
-- [ ] **Text Channels** - for text based communication and messaging.
-- [ ] **Forum / Thread** channels.
-- [ ] **Lua Scripting** - MLUA with LuaJIT compilation for fast, familiar and reliable extension. This should enable polling of games and other API's to provide data for Undertone's data driven voice pipeline.
-- [ ] **Data API** - `Undertone Client` exposes a slim API to allow games to be modded and transmit information to the client which may be encoded.
-- [ ] **Persistent ServerStorage**:
-    - [ ] **Key Value Pair** (Plain Text) - The simplest form of database using a plain text flat file to store user and server data.  Can become slow and cumbersome quickly, but good for testing and base functionality.
-    - [ ] **Key Value Pair** (Binary) - using binary KVP storage and efficient libraries the file remains local to the server but is in encrypted.
-    - [ ] **Database Adapter** - Adapters for common databases:
-        - [ ] `MongoDB` A very popular NoSQL document storage database.
-        - [ ] `PostgreSQL` Cornerstone of relational data.
-        - [ ] `MySql` / `MariaDb` The ultimate opensource DB.
+# Financing and Licensing
 
-## Project Dependencies
+## Undertone License 1.0
+Undertone and its parts are ***NOT*** offered under an `Open Source` license. Instead, we use a custom `Source Available` license to control the rights and usage of the software, as well as protect against competition and profiteering by commercial entities.
 
-Every great project is built on the backs of giants who came before it. Undertone is no different, though we strive to minimize the amount of dependencies to keep the project sleek and light-weight, it would be irresponsible to re-invent every wheel we need when solutions already exist.  This list is non-exhaustive and can and will change over the lifetime of the project. For version specific dependencies be sure to check the CHANGELOG.
+Read the [LICENSE.md](LICENSE.md) to get the details.
 
-### [rkyv](https://crates.io/crates/rkyv)
+For those not familiar `Source Available` indicates we will keep the source code visible and available to public, ensuring visibility and accountability. We encourage contribution by individuals and permit communities to modify their version of Undertone to suite their needs as long as they do not try to sell or compete with their version of the software.
 
-Provides a serialization framework that allows typical type safe serialization across boundaries as well as zero-copy extremely fast archive access for time and memory critical operations such as audio packet processing.
+## Financial Goals
+No project is truly free. It is paid for with the effort, experience, time, and ideas of the developers and community. While we begin the project as a small volunteer team, the scope, and vision for the future will require the ability to pay for developers time, resources and ensure the continued success and enhancement of Undertone. These are a few suggested solutions to help increase the viability of the project in the future:
+- [ ] Rent cloud based servers (users may choose to forgo the self hosting route and lease servers from Undertone for a reasonable fee)
+- [ ] License ability to host for profit to other providers removing the hosting burden from Undertone while creating income streams from other companies.
+- [ ] License Enterprise versions that support on-premises hosting for companies making more than a set monetary limit. This would enable charging for the software without restricting usage or access to small companies and communities.
+- [ ] Marketplace for visual enhancements and artist made icons/themes/backgrounds allowing users to earn money for their art while also helping to fund the project. (This must be done without restricting the ability of normal users to use their own artworks as long as they possess the rights to the art).
 
-### [flyweights](https://crates.io/crates/flyweights)
+Long-term the idea is move ownership to a nonprofit organization that owns and manages the project with the goal of providing a needed community service.
 
-Interning string allocations for user strings.
+# Contributing
 
-### [thiserror](https://crates.io/crates/thiserror)
+If you are interesting in contributing and helping the development of Undertone be sure to read [CONTRIBUTING.md](CONTRIBUTING.md) and [LICENSE.md](LICENSE.md).
+# Copyright and Ownership
 
-Provides macros to assist in effective error type creations, especially in crates/libraries shared between Undertone applications.
+Undertone is the sole property of [Cephy314](https://github.com/Cephy314) aka Victoria Beauray Sagady.
 
-### [anyhow](https://crates.io/crates/anyhow)
+Copyright © 2025, Victoria Beauray Sagady. All rights reserved.
 
-Easier dynamic error handling in application environments when strict entry per error is burdensome.
+# Appendices
+1. [Style Guide](docs/styleguide.md)
+2. [Protocol Design](docs/protocol.md)
 
-### [tokio](https://tokio.rs/)
-
-Async Networking and thread handling used in just about every part of Undertone in some way.
-
-### [Dioxus](https://dioxuslabs.com/)
-
-Rust centric cross platform framework that leverages the power of webview (or native eventual) rendering.  Tightly coupled to rust it allows us to keep our focus in one primary language and share code more easily. Building with Dioxus will also allow us to share components and code with web and mobile versions of future applications.
-
-### [ractor](https://docs.rs/ractor/latest/ractor/)
-
-Rust implementation of the Erlang actor framework. Especially targeted for the back end where many processess need to be spawned,  managed and able to communicate with others without the built in chaos of constant borrowing and locking. Using channels and events to communicate this framework is ideal for intensive fast paced back ends and enabled distributed processes (allowing load balancing without increasing complexity of communication between processes).
-
-## Networking
-
-Undertone uses two primary network layers to accomplish fast and reliable communication between the users.
-
-### Client <-> Server Architecture
-
-Due to the nature of data being transmitted all clients will pass their communications through a central server, hosted by the community owner(s) on their own hardware or leased through a provider.  It is recommended that the server be run with or adjacent to the game server with shared network to allow for more complex interactions via scripting extensions and server authorative interactions.
-
-#### Control Layer
-
-To handle any messaging between clients and server that must be reliable a TCP/IP based control layer enables reliable communications with guaranteed delivery.  This is achieved at the cost of speed and processing power so this layer should never be used for time sensitive or high volume traffic.
-
-#### Voice & Data Layer
-
-To enable high speed low overhead transmission of time critical but unreliable information Undertone uses a UDP layer which transmits voice packets that can contain meta data about the user's state while transmitting such as 3D position, effect parameterization and info about side traffic (radio or other non channel based communications)
