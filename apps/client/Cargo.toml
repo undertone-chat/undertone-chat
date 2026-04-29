@@ -1,11 +1,16 @@
 [package]
 name = "undertone-client"
+description = "Undertone dioxus client to connect to undertone servers."
+keywords.workspace = true
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
-license.workspace = true
+license-file.workspace = true
+readme.workspace = true
 publish.workspace = true
-
+homepage.workspace = true
+repository.workspace = true
+documentation = "https://docs.undertone.chat/undertone-client"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]

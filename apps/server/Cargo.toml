@@ -1,11 +1,16 @@
 [package]
 name = "undertone-cli-server"
+description = "Undertone server run from the command line."
+keywords.workspace = true
 version.workspace = true
 authors.workspace = true
-license.workspace = true
-description = "Undertone voice chat server run from the command line."
+license-file.workspace = true
+readme.workspace = true
 publish.workspace = true
 edition.workspace = true
+homepage.workspace = true
+repository.workspace = true
+documentation="https://dev.undertone.chat/undertone-cli-server"
 
 [dependencies]
 undertone-serialization.workspace = true

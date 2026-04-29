@@ -1,10 +1,16 @@
 [package]
 name = "undertone-serialization"
+description = "Shared serialization and protocols for Undertone"
+keywords.workspace = true
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
-license.workspace = true
+license-file.workspace = true
+readme.workspace = true
 publish.workspace = true
+homepage.workspace = true
+repository.workspace = true
+documentation = "https://docs.undertone.chat/undertone-serialization"
 
 [dependencies]
 rkyv = {version="~0.8.15", features=["little_endian", "aligned", "uuid-1"] }
