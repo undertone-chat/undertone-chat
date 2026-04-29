@@ -1,7 +1,6 @@
 // Modules
 mod audio;
 mod components;
-mod control_connection;
 mod ui_events;
 // Dependencies
 use components::ServerConnect;
@@ -10,8 +9,6 @@ use dioxus::prelude::*;
 use tokio::sync::mpsc;
 use tracing::Level;
 use ui_events::UiEvent;
-
-use crate::control_connection::{ControlCommand, ControlConnection};
 
 const ICON: Asset = asset!("/icons/icon.ico");
 const LOGO: Asset = asset!("/assets/undertone_icon.svg");
@@ -34,11 +31,11 @@ fn App() -> Element {
     // Spawn the Audio thread ONLY ONCE using use_hook
     use_hook(|| {
         // Create channels for communication
-        let (control_tx, control_rx) = mpsc::unbounded_channel::<ControlCommand>();
+        // let (control_tx, control_rx) = mpsc::unbounded_channel::<ControlCommand>();
         let (event_tx, mut event_rx) = mpsc::unbounded_channel::<UiEvent>();
         let (audio_tx, audio_rx) = unbounded();
 
-        provide_context(control_tx);
+        // provide_context(control_tx);
         // Provide the control sender to the whole dioxus app.
         std::thread::Builder::new()
             .name("undertone-audio".into())

@@ -1,3 +1,3 @@
 mod engine;
 
-pub use engine::{AudioEngine, AudioCommand};
+pub use engine::{AudioCommand, AudioEngine};

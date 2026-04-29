@@ -1,6 +1,17 @@
 [workspace]
-resolver = "2"
+resolver = "3"
 members = ["crates/undertone-serialization", "apps/server", "apps/client"]
+
+[workspace.package]
+version = "0.1.0"
+authors = ["Victoria Beauray Sagady"]
+readme = "README.md"
+license-file = "LICENSE.md"
+edition = "2024"
+homepage = "https://github.com/undertone-chat/undertone-chat"
+license = "ULv1"
+publish = false
+repository = "https://github.com/undertone-chat/undertone-chat"
 
 [workspace.dependencies]
 log = "0.4.29"
