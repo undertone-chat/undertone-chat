@@ -1,16 +1,16 @@
-<!-- omit in toc -->
+
 # Contributing to Undertone
 
-First and foremost thank you so much for your interesting in contributing to  Undertone!
+First and foremost thank you so much for your interesting in contributing to Undertone!
 
 All types of contributions are encouraged and valued. See the [Table of Contents](#table-of-contents) for different ways to help and details about how this project handles them. Please make sure to read the relevant section before making your contribution. It will make it a lot easier for us maintainers and smooth out the experience for all involved. The community looks forward to your contributions. 🎉
 
 > And if you like the project, but just don't have time to contribute, that's fine. There are other easy ways to support the project and show your appreciation, which we would also be very happy about:
 > - Star the project
 > - Tweet about it
-> - Provide a link to undertone.chat in your community media.
+> - Provide a link to [https://undertone.chat](https://undertone.chat) in your community media.
 
-<!-- omit in toc -->
+
 ## Table of Contents
 
 - [Code of Conduct](#code-of-conduct)
@@ -30,7 +30,7 @@ All types of contributions are encouraged and valued. See the [Table of Contents
 This project and everyone participating in it is governed by the
 [Undertone Code of Conduct](https://github.com/undertone-chat/undertone-chat/blob//CODE_OF_CONDUCT.md).
 By participating, you are expected to uphold this code. Please report unacceptable behavior
-to [community@undertone.chat](mailto://community@undertone.chat).
+to [community@undertone.chat](mailto:community@undertone.chat).
 
 ## I Have a Question
 
@@ -42,33 +42,18 @@ If you then still feel the need to ask a question and need clarification, we rec
 
 - Open an [Issue](https://github.com/undertone-chat/undertone-chat/issues/new).
 - Provide as much context as you can about what you're running into.
-- Provide project and platform versions (nodejs, npm, etc), depending on what seems relevant.
+- Provide project and platform details that seem relevant, such as the Rust toolchain version, Cargo version, operating system, and architecture.
 
 We will then take care of the issue as soon as possible.
 
-<!--
-You might want to create a separate issue tag for questions and include it in this description. People should then tag their issues accordingly.
-
-Depending on how large the project is, you may want to outsource the questioning, e.g. to Stack Overflow or Gitter. You may add additional contact and information possibilities:
-- IRC
-- Slack
-- Gitter
-- Stack Overflow tag
-- Blog
-- FAQ
-- Roadmap
-- E-Mail List
-- Forum
--->
-
 ## I Want To Contribute
 
-> ### Legal Notice <!-- omit in toc -->
+> ### Legal Notice
 > When contributing to this project, you must agree that you have authored 100% of the content, that you have the necessary rights to the content and that the content you contribute may be provided under the project licence.
 
 ### Reporting Bugs
 
-<!-- omit in toc -->
+
 #### Before Submitting a Bug Report
 
 A good bug report shouldn't leave others needing to chase you up for more information. Therefore, we ask you to investigate carefully, collect information and describe the issue in detail in your report. Please complete the following steps in advance to help us fix any potential bug as fast as possible.
@@ -84,7 +69,7 @@ A good bug report shouldn't leave others needing to chase you up for more inform
 - Possibly your input and the output
 - Can you reliably reproduce the issue? And can you also reproduce it with older versions?
 
-<!-- omit in toc -->
+
 #### How Do I Submit a Good Bug Report?
 
 > You must never report security related issues, vulnerabilities or bugs including sensitive information to the issue tracker, or elsewhere in public. Instead sensitive bugs must be sent by email to .
@@ -110,7 +95,7 @@ Once it's filed:
 
 This section guides you through submitting an enhancement suggestion for Undertone, **including completely new features and minor improvements to existing functionality**. Following these guidelines will help maintainers and the community to understand your suggestion and find related suggestions.
 
-<!-- omit in toc -->
+
 #### Before Submitting an Enhancement
 
 - Make sure that you are using the latest version.
@@ -118,7 +103,7 @@ This section guides you through submitting an enhancement suggestion for Underto
 - Perform a [search](https://github.com/undertone-chat/undertone-chat/issues) to see if the enhancement has already been suggested. If it has, add a comment to the existing issue instead of opening a new one.
 - Find out whether your idea fits with the scope and aims of the project. It's up to you to make a strong case to convince the project's developers of the merits of this feature. Keep in mind that we want features that will be useful to the majority of our users and not just a small subset. If you're just targeting a minority of users, consider writing an add-on/plugin library.
 
-<!-- omit in toc -->
+
 #### How Do I Submit a Good Enhancement Suggestion?
 
 Enhancement suggestions are tracked as [GitHub issues](https://github.com/undertone-chat/undertone-chat/issues).
@@ -152,6 +137,6 @@ Updating, improving and correcting the documentation
 ## Join The Project Team
 <!-- TODO -->
 
-<!-- omit in toc -->
+
 ## Attribution
 This guide is based on the [contributing.md](https://contributing.md/generator)!
