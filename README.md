@@ -13,7 +13,7 @@ These are some of the key features that are planned for implementation, the list
 
 The core of the software is supporting voice comms for everything from casual chat to specialize solutions for MIL-SIM and roleplay in games in FiveM, RedM, Flight Sims, ARMA and more.
 
-- [ ] Channel based voice chat for community and casual gaming similar to Discord or TeamSpeak.
+- [ ] Channel based voice chat for community and casual gaming as you might find on Discord or TeamSpeak.
 - [ ] World mode: positional 3D
 - [ ] SubMix mode: Customizable voice channels used to simulate radios, cell phones and even supernatural telepathy, you control the effects and rules of how it is rendered.
 
