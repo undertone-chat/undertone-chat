@@ -3,24 +3,6 @@
 ![GitHub commit activity (branch)](https://img.shields.io/github/commit-activity/m/undertone-chat/undertone-chat/main)
 ![GitHub Tag](https://img.shields.io/github/v/tag/undertone-chat/undertone-chat)
 
-***TABLE OF CONTENTS***
-
-<!-- TOC -->
-
-- [1. Undertone](#1-undertone)
-- [2. Key Features](#2-key-features)
-  - [2.1. Voice Communication](#21-voice-communication)
-  - [2.2. Text Communication](#22-text-communication)
-  - [2.3. Control and Privacy](#23-control-and-privacy)
-  - [2.4. Realtime Game Data and Extensibility](#24-realtime-game-data-and-extensibility)
-- [3. Financing and Licensing](#3-financing-and-licensing)
-  - [3.1. Undertone License 1.0](#31-undertone-license-10)
-  - [3.2. Fancial Goals](#32-fancial-goals)
-- [4. Contributing](#4-contributing)
-- [5. Copyright and Ownership](#5-copyright-and-ownership)
-- [6. Appendicies](#6-appendicies)
-
-<!-- /TOC -->
 # Undertone
 Voice comms and community tools for serious gaming and roleplay. Undertone is designed to fill a niche in the gaming world where communities find them selves spread across many different solutions for voice, chat, scheduling and specialized tools used by roleplay and sim communities.3
 
